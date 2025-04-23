@@ -1,0 +1,11 @@
+DB:
+  hostname: 127.0.0.1
+  port: 3306
+  username: root
+  password: sls123
+  database: cmdb
+  sslmode: disable
+  pool_size: 5
+  timeout: 500ms
+  max_open_conns: 10
+  max_idle_conns: 5
