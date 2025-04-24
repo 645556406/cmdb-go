@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
 )
 
@@ -15,6 +16,15 @@ type Response struct {
 	Message string      `json:"message,omitempty"`
 }
 
+// GetServerList 从 DAO 层获取服务器列表并返回给客户端
+//
+// 参数:
+//
+//	c: *gin.Context - Gin 框架的上下文对象，用于处理 HTTP 请求和响应
+//
+// 返回值:
+//
+//	无
 func GetServerList(c *gin.Context) {
 	serverList := dao.GetServerList()
 	var response Response
@@ -30,6 +40,15 @@ func Ping(c *gin.Context) {
 	})
 }
 
+// AddServer 函数用于处理添加服务器的请求
+//
+// 参数:
+//
+//	context: *gin.Context - HTTP请求的上下文对象
+//
+// 返回值:
+//
+//	无
 func AddServer(context *gin.Context) {
 	var server model.Server
 	if err := context.ShouldBindJSON(&server); err != nil {
@@ -45,6 +64,15 @@ func AddServer(context *gin.Context) {
 	}
 }
 
+// DelServer 用于删除服务器信息
+//
+// 参数:
+//
+//	context: gin的上下文对象，用于处理HTTP请求
+//
+// 返回值:
+//
+//	无
 func DelServer(context *gin.Context) {
 	var server model.Server
 	if err := context.ShouldBindJSON(&server); err != nil {
@@ -60,6 +88,15 @@ func DelServer(context *gin.Context) {
 	}
 }
 
+// UpdateServer 用于更新服务器信息
+//
+// 参数:
+//
+//	context: *gin.Context - gin框架的上下文对象
+//
+// 返回值:
+//
+//	无
 func UpdateServer(context *gin.Context) {
 	var server model.Server
 	if err := context.ShouldBindJSON(&server); err != nil {
@@ -78,6 +115,15 @@ func UpdateServer(context *gin.Context) {
 	}
 }
 
+// GetServerDetailByID 函数通过服务器ID获取服务器详细信息
+//
+// 参数：
+//
+//	context *gin.Context：Gin框架的上下文对象，用于处理HTTP请求
+//
+// 返回值：
+//
+//	无
 func GetServerDetailByID(context *gin.Context) {
 	serverID := context.Param("id")
 	log.Println("GetServerDetailByID:", serverID)
@@ -93,4 +139,25 @@ func GetServerDetailByID(context *gin.Context) {
 	} else {
 		context.JSON(http.StatusOK, Response{Code: 20000, Message: "success", Data: serverFirst})
 	}
+}
+
+// GetServerOneByIP 是一个根据IP获取服务器信息的处理函数
+func GetServerOneByIP(context *gin.Context) {
+	IP := context.Param("ip")
+	ipv4Pattern := `^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$`
+	re := regexp.MustCompile(ipv4Pattern)
+	if !re.MatchString(IP) {
+		context.JSON(http.StatusOK, Response{Code: 40001, Message: "IP参数格式错误"})
+		return
+	}
+	if IP == "" {
+		context.JSON(http.StatusOK, Response{Code: 40001, Message: "IP参数不能为空"})
+		return
+	}
+	server, err := dao.GetServerOneByIP(IP)
+	if err != nil {
+		context.JSON(http.StatusOK, Response{Code: 50000, Message: "IP不存在", Data: server})
+		return
+	}
+	context.JSON(http.StatusOK, Response{Code: 20000, Message: "success", Data: server})
 }
