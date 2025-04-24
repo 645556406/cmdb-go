@@ -1,11 +1,11 @@
 <template>
   <div class="app-container">
-    <div style="display: flex;justify-content: left; align-items: center; gap: 10px; ">
+    <div style="display: flex;justify-content: left; align-items: center; gap: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04); height: 100px;">
       <!-- 触发按钮 -->
-      <el-button type="primary" @click="dialogVisible = true">新增服务器</el-button>
+      <el-button type="primary" size="mini" style="margin-left: 30px;" @click="dialogVisible = true">新增服务器</el-button>
       <!-- 搜索 -->
-      <el-input v-model="searchQuery" placeholder="请输入搜索内容" style="width: 200px" />
-      <el-button type="primary" @click="dialogVisible = true">查询</el-button>
+      <el-input v-model="searchQuery" size="mini" placeholder="请输入要搜索的IP" style="width: 200px" />
+      <el-button type="primary" size="mini" @click="searchOneByIP">查询</el-button>
     </div>
     <div>
       <!-- 对话框表单 -->
@@ -37,13 +37,14 @@
       <el-table
         v-loading="listLoading"
         :data="list"
+        :height="960"
         element-loading-text="Loading"
         border
         fit
         highlight-current-row
-        style="width: 100%;margin-top:30px;"
+        style="width: 100%;margin-top:30px; gap: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);"
       >
-        <el-table-column align="center" label="ID" width="95">
+        <el-table-column align="center" label="ID" width="95" fixed="left">
           <template slot-scope="scope">
             {{ scope.row.ID }}
           </template>
@@ -100,13 +101,18 @@
             <span>{{ scope.row.UpdatedAt }}</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="Actions" width="235" class-name="small-padding fixed-width">
+        <el-table-column align="center" label="Actions" width="235" fixed="right" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" @click="dialog = true, row = scope.row">编辑</el-button>
             <el-button type="danger" size="mini" @click="confirmRole(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :total="1000"
+      />
     </div>
     <div>
       <el-drawer
@@ -155,7 +161,7 @@
 </template>
 
 <script>
-import { getList, updateServer, delServer, addServer } from '@/api/table'
+import { getList, updateServer, delServer, addServer, getOneByID } from '@/api/table'
 
 export default {
   filters: {
@@ -170,6 +176,7 @@ export default {
   },
   data() {
     return {
+      searchQuery: '',
       row: {},
       table: false,
       dialog: false,
@@ -193,6 +200,26 @@ export default {
     this.fetchData()
   },
   methods: {
+    // 搜索还是有问题
+    searchOneByIP() {
+      this.listLoading = true
+      getOneByID(this.searchQuery.trim()).then((response) => {
+        if (response.code === 20000) {
+          const serverList = []
+          serverList.push(response.data)
+          this.list = serverList
+          this.listLoading = false
+        } else {
+          this.$message({
+            type: 'faild',
+            message: response.message
+          })
+        }
+      }).catch(
+        console.log('数据未查询到！'),
+        this.listLoading = false
+      )
+    },
     submitForm() {
       addServer(this.form).then((response) => {
         console.log(response)

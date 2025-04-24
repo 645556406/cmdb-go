@@ -28,3 +28,9 @@ export function addServer(data) {
     data
   })
 }
+export function getOneByID(ip) {
+  return request({
+    url: `/api/v1/server/get/${ip}`,
+    method: 'get'
+  })
+}

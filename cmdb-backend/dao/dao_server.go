@@ -83,3 +83,15 @@ func GetServerDetailByID(id uint64) (model.Server, error) {
 		return server, nil
 	}
 }
+
+func GetServerOneByIP(ip string) (model.Server, error) {
+	db := NewDB()
+	var server model.Server
+	err := db.Where("IP = ?", ip).First(&server).Error
+	if err != nil {
+		log.Println(err)
+		return server, err
+	} else {
+		return server, nil
+	}
+}
