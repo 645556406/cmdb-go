@@ -20,6 +20,10 @@ func main() {
 		v1.GET("/detail/:id", service.GetServerDetailByID)
 		v1.GET("/get/:ip", service.GetServerOneByIP)
 	}
+	{
+		v2 := r.Group("/api/v1/ssh")
+		v2.GET("/connect", service.HandleWebSSH)
+	}
 	err := r.Run(":8080")
 	if err != nil {
 		return

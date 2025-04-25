@@ -1,11 +1,11 @@
 <template>
   <div class="app-container">
     <div style="display: flex;justify-content: left; align-items: center; gap: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04); height: 100px;">
-      <!-- 触发按钮 -->
-      <el-button type="primary" size="mini" style="margin-left: 30px;" @click="dialogVisible = true">新增服务器</el-button>
       <!-- 搜索 -->
-      <el-input v-model="searchQuery" size="mini" placeholder="请输入要搜索的IP" style="width: 200px" />
+      <el-input v-model="searchQuery" size="mini" placeholder="请输入要搜索的IP" style="width: 200px; margin-left: 30px;" />
       <el-button type="primary" size="mini" @click="searchOneByIP">查询</el-button>
+      <!-- 触发按钮 -->
+      <el-button type="primary" size="mini" @click="dialogVisible = true">新增服务器</el-button>
     </div>
     <div>
       <!-- 对话框表单 -->
@@ -103,6 +103,8 @@
         </el-table-column>
         <el-table-column align="center" label="Actions" width="235" fixed="right" class-name="small-padding fixed-width">
           <template slot-scope="scope">
+            <el-button type="primary" size="mini" @click="openTerminalSafe(scope.row)">安全连接</el-button>
+            <el-button type="primary" size="mini" @click="openTerminal(scope.row)">连接</el-button>
             <el-button type="primary" size="mini" @click="dialog = true, row = scope.row">编辑</el-button>
             <el-button type="danger" size="mini" @click="confirmRole(scope.row)">删除</el-button>
           </template>
@@ -209,6 +211,34 @@ export default {
     this.fetchData()
   },
   methods: {
+    openTerminalSafe(row) {
+      console.log(row.IP)
+      const params = {
+        host: row.IP,
+        username: 'root',
+        password: 'sls123'
+      }
+      // 1. 先存储到 Vuex，注意因为 Vuex 是单页面存储，不能跨页面使用
+      // this.$store.commit('terminal/setSSHParams', params)
+      // console.log(this.$store.state.terminal.sshParams)
+      sessionStorage.setItem('sshParams', JSON.stringify(params))
+      // 2. 打开新窗口（不带敏感参数）
+      const route = this.$router.resolve({ name: 'Terminal' })
+      window.open(route.href)
+    },
+    openTerminal(row) {
+      console.log(this.row.IP)
+      const params = {
+        host: row.IP,
+        username: 'root',
+        password: 'sls123'
+      }
+      const url = this.$router.resolve({
+        name: 'Terminal',
+        query: params
+      }).href
+      window.open(url, '_blank') // 新窗口打开
+    },
     // 每页条数改变
     handleSizeChange(val) {
       this.pageSize = val

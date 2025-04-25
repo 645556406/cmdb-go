@@ -6,6 +6,7 @@ type Server struct {
 	gorm.Model
 	Hostname string `gorm:"unique;not null"` // 主机名
 	IP       string `gorm:"unique"`          // IP 地址
+	Port     int    // 端口号
 	OS       string // 操作系统
 	CPU      int    // CPU 核数
 	Memory   int    // 内存（GB）
