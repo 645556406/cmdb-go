@@ -2,11 +2,24 @@ package dao
 
 import (
 	"cmdb-backend/model"
+	"database/sql"
 	"log"
 )
 
 func GetServerList() []model.Server {
 	db := NewDB()
+	// 获取通用数据库对象 sql.DB，然后使用其提供的功能
+	sqlDB, errDb := db.DB()
+	if errDb != nil {
+		log.Println(errDb)
+	}
+	// Close
+	defer func(sqlDB *sql.DB) {
+		err := sqlDB.Close()
+		if err != nil {
+
+		}
+	}(sqlDB)
 	var serverList []model.Server
 	err := db.Find(&serverList).Where("delete_at = ", "").Error
 	if err != nil {
@@ -17,6 +30,18 @@ func GetServerList() []model.Server {
 
 func UpdateServer(server model.Server) error {
 	db := NewDB()
+	// 获取通用数据库对象 sql.DB，然后使用其提供的功能
+	sqlDB, errDb := db.DB()
+	if errDb != nil {
+		log.Println(errDb)
+	}
+	// Close
+	defer func(sqlDB *sql.DB) {
+		err := sqlDB.Close()
+		if err != nil {
+
+		}
+	}(sqlDB)
 	serverUpdate := model.Server{}
 	serverFields := make([]string, 0)
 	if server.Hostname != "" {
@@ -56,6 +81,18 @@ func UpdateServer(server model.Server) error {
 
 func AddServer(server model.Server) error {
 	db := NewDB()
+	// 获取通用数据库对象 sql.DB，然后使用其提供的功能
+	sqlDB, errDb := db.DB()
+	if errDb != nil {
+		log.Println(errDb)
+	}
+	// Close
+	defer func(sqlDB *sql.DB) {
+		err := sqlDB.Close()
+		if err != nil {
+
+		}
+	}(sqlDB)
 	err := db.Create(&server).Error
 	if err != nil {
 		log.Println(err)
@@ -65,6 +102,18 @@ func AddServer(server model.Server) error {
 
 func DelServer(server model.Server) error {
 	db := NewDB()
+	// 获取通用数据库对象 sql.DB，然后使用其提供的功能
+	sqlDB, errDb := db.DB()
+	if errDb != nil {
+		log.Println(errDb)
+	}
+	// Close
+	defer func(sqlDB *sql.DB) {
+		err := sqlDB.Close()
+		if err != nil {
+
+		}
+	}(sqlDB)
 	err := db.Delete(&server).Error
 	if err != nil {
 		log.Println(err)
@@ -74,6 +123,18 @@ func DelServer(server model.Server) error {
 
 func GetServerDetailByID(id uint64) (model.Server, error) {
 	db := NewDB()
+	// 获取通用数据库对象 sql.DB，然后使用其提供的功能
+	sqlDB, errDb := db.DB()
+	if errDb != nil {
+		log.Println(errDb)
+	}
+	// Close
+	defer func(sqlDB *sql.DB) {
+		err := sqlDB.Close()
+		if err != nil {
+
+		}
+	}(sqlDB)
 	var server model.Server
 	err := db.First(&server, id).Error
 	if err != nil {
@@ -86,6 +147,18 @@ func GetServerDetailByID(id uint64) (model.Server, error) {
 
 func GetServerOneByIP(ip string) (model.Server, error) {
 	db := NewDB()
+	// 获取通用数据库对象 sql.DB，然后使用其提供的功能
+	sqlDB, errDb := db.DB()
+	if errDb != nil {
+		log.Println(errDb)
+	}
+	// Close
+	defer func(sqlDB *sql.DB) {
+		err := sqlDB.Close()
+		if err != nil {
+
+		}
+	}(sqlDB)
 	var server model.Server
 	err := db.Where("IP = ?", ip).First(&server).Error
 	if err != nil {

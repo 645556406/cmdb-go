@@ -37,34 +37,34 @@
       <el-table
         v-loading="listLoading"
         :data="list"
-        :height="960"
+        :height="620"
         element-loading-text="Loading"
         border
         fit
         highlight-current-row
-        style="width: 100%;margin-top:30px; gap: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);"
+        style="width: 100%;margin-top:30px; gap: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);align-items: center;"
       >
-        <el-table-column align="center" label="ID" width="95" fixed="left">
+        <el-table-column align="center" label="ID" fixed="left">
           <template slot-scope="scope">
             {{ scope.row.ID }}
           </template>
         </el-table-column>
-        <el-table-column label="HostName">
+        <el-table-column label="HostName" min-width="120">
           <template slot-scope="scope">
             {{ scope.row.Hostname }}
           </template>
         </el-table-column>
-        <el-table-column label="IP" width="110" align="center">
+        <el-table-column label="IP" align="center" min-width="120">
           <template slot-scope="scope">
             <span>{{ scope.row.IP }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Env" width="110" align="center">
+        <el-table-column label="Env" align="center">
           <template slot-scope="scope">
             {{ scope.row.Env }}
           </template>
         </el-table-column>
-        <el-table-column class-name="status-col" label="OS" width="110" align="center">
+        <el-table-column class-name="status-col" label="OS" align="center">
           <template slot-scope="scope">
             <el-tag :type="scope.row.status | statusFilter">{{ scope.row.OS }}</el-tag>
           </template>
@@ -89,13 +89,13 @@
             {{ scope.row.Status }}
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="created_at" label="CreateTime" width="200">
+        <el-table-column align="center" prop="created_at" label="CreateTime" width="250">
           <template slot-scope="scope">
             <i class="el-icon-time" />
             <span>{{ scope.row.CreatedAt }}</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="updated_at" label="UpdateTime" width="200">
+        <el-table-column align="center" prop="updated_at" label="UpdateTime" width="250">
           <template slot-scope="scope">
             <i class="el-icon-time" />
             <span>{{ scope.row.UpdatedAt }}</span>
@@ -108,11 +108,6 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination
-        background
-        layout="prev, pager, next"
-        :total="1000"
-      />
     </div>
     <div>
       <el-drawer
@@ -157,6 +152,17 @@
         </div>
       </el-drawer>
     </div>
+    <div>
+      <el-pagination
+        :current-page="currentPage"
+        :page-sizes="[10, 20, 30, 50]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
+    </div>
   </div>
 </template>
 
@@ -176,6 +182,9 @@ export default {
   },
   data() {
     return {
+      currentPage: 1, // 当前页码
+      pageSize: 10, // 每页条数
+      total: 0, // 总数据量
       searchQuery: '',
       row: {},
       table: false,
@@ -200,6 +209,16 @@ export default {
     this.fetchData()
   },
   methods: {
+    // 每页条数改变
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.fetchData()
+    },
+    // 当前页改变
+    handleCurrentChange(val) {
+      this.currentPage = val
+      this.fetchData()
+    },
     // 搜索还是有问题
     searchOneByIP() {
       this.listLoading = true
@@ -282,11 +301,22 @@ export default {
     fetchData() {
       this.listLoading = true
       getList().then(response => {
-        console.log(response)
-        this.list = response.data
+        this.total = (response.data).length // 假设总共有100条数据
+        // 根据分页参数截取数据
+        const start = (this.currentPage - 1) * this.pageSize
+        const end = start + this.pageSize
+        this.list = response.data.slice(start, end)
         this.listLoading = false
       })
     },
+    // fetchData() {
+    //   this.listLoading = true
+    //   getList().then(response => {
+    //     console.log(response)
+    //     this.list = response.data
+    //     this.listLoading = false
+    //   })
+    // },
     confirmRole(row) {
       this.$confirm('此操作将永久删除该服务器, 是否继续?', '提示', {
         confirmButtonText: '确定',
