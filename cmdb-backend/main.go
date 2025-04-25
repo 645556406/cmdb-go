@@ -22,7 +22,8 @@ func main() {
 	}
 	{
 		v2 := r.Group("/api/v1/ssh")
-		v2.GET("/connect", service.HandleWebSSH)
+		//v2.GET("/connect", service.HandleWebSSH)
+		v2.GET("/connect", service.HandleWebSSHSinger)
 	}
 	err := r.Run(":8080")
 	if err != nil {

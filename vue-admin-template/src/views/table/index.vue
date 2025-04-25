@@ -101,10 +101,9 @@
             <span>{{ scope.row.UpdatedAt }}</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="Actions" width="235" fixed="right" class-name="small-padding fixed-width">
+        <el-table-column align="center" label="Actions" width="300" fixed="right" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" @click="openTerminalSafe(scope.row)">安全连接</el-button>
-            <el-button type="primary" size="mini" @click="openTerminal(scope.row)">连接</el-button>
             <el-button type="primary" size="mini" @click="dialog = true, row = scope.row">编辑</el-button>
             <el-button type="danger" size="mini" @click="confirmRole(scope.row)">删除</el-button>
           </template>
@@ -220,24 +219,10 @@ export default {
       }
       // 1. 先存储到 Vuex，注意因为 Vuex 是单页面存储，不能跨页面使用
       // this.$store.commit('terminal/setSSHParams', params)
-      // console.log(this.$store.state.terminal.sshParams)
       sessionStorage.setItem('sshParams', JSON.stringify(params))
       // 2. 打开新窗口（不带敏感参数）
       const route = this.$router.resolve({ name: 'Terminal' })
       window.open(route.href)
-    },
-    openTerminal(row) {
-      console.log(this.row.IP)
-      const params = {
-        host: row.IP,
-        username: 'root',
-        password: 'sls123'
-      }
-      const url = this.$router.resolve({
-        name: 'Terminal',
-        query: params
-      }).href
-      window.open(url, '_blank') // 新窗口打开
     },
     // 每页条数改变
     handleSizeChange(val) {
