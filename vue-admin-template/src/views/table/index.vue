@@ -101,7 +101,7 @@
             <span>{{ scope.row.UpdatedAt }}</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="Actions" width="300" fixed="right" class-name="small-padding fixed-width">
+        <el-table-column align="center" label="Actions" width="250" fixed="right" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" @click="openTerminalSafe(scope.row)">安全连接</el-button>
             <el-button type="primary" size="mini" @click="dialog = true, row = scope.row">编辑</el-button>
