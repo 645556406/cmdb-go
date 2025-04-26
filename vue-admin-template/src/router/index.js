@@ -67,19 +67,19 @@ export const constantRoutes = [
         name: 'Table',
         component: () => import('@/views/table/index'),
         meta: { title: 'Server', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
-      },
-      {
-        path: 'ssh',
-        name: 'SSH',
-        component: () => import('@/components/Terminal/index'),
-        meta: { title: 'SSH', icon: 'ssh' }
       }
+      // {
+      //   path: 'tree',
+      //   name: 'Tree',
+      //   component: () => import('@/views/tree/index'),
+      //   meta: { title: 'Tree', icon: 'tree' }
+      // },
+      // {
+      //   path: 'ssh',
+      //   name: 'SSH',
+      //   component: () => import('@/components/Terminal/index'),
+      //   meta: { title: 'SSH', icon: 'ssh' }
+      // }
     ]
   },
   {
@@ -87,6 +87,7 @@ export const constantRoutes = [
     name: 'Terminal',
     component: () => import('@/components/Terminal/index'),
     meta: { title: 'SSH', icon: 'ssh' },
+    hidden: true,
     props: (route) => ({ // 将 URL 参数转为 props
       host: route.query.host,
       username: route.query.username,

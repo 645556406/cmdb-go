@@ -55,7 +55,6 @@ func HandleWebSSH(c *gin.Context) {
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // 生产环境应验证HostKey
 		Timeout:         10 * time.Second,
 	}
-	log.Println(params)
 	sshClient, errC := ssh.Dial("tcp", params.Host+":22", config)
 	if errC != nil {
 		ws.WriteJSON(map[string]string{"error": "SSH连接失败: " + errC.Error()})
@@ -123,7 +122,7 @@ func (w *sshWriter) Write(p []byte) (n int, err error) {
 // c *gin.Context: gin框架的上下文对象，用于处理HTTP请求和响应。
 func HandleWebSSHSinger(c *gin.Context) {
 	log.Println("收到连接请求")
-	// 升级HTTP连接为WebSocket
+	//1. 升级HTTP连接为WebSocket
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
@@ -137,7 +136,7 @@ func HandleWebSSHSinger(c *gin.Context) {
 		}
 	}(ws)
 
-	// 读取前端发送的连接参数
+	// 2. 读取前端发送的连接参数
 	var params struct {
 		Host     string `json:"host"`
 		Username string `json:"username"`
@@ -147,14 +146,14 @@ func HandleWebSSHSinger(c *gin.Context) {
 		log.Println("参数解析失败:", err)
 		return
 	}
-	// 1. 读取私钥文件
+	// 3. 读取并解析私钥文件
 	privateKeyBytes, err := ioutil.ReadFile("/Users/wangye/.ssh/id_rsa")
 	fmt.Println(string(privateKeyBytes))
 	if err != nil {
 		return
 	}
 
-	// 2. 解析私钥（支持加密的私钥）
+	// 4. 解析私钥（支持加密的私钥）
 	signer, errSSH := ssh.ParsePrivateKey(privateKeyBytes)
 	if errSSH != nil {
 		// 如果私钥有密码，尝试解密
@@ -169,17 +168,18 @@ func HandleWebSSHSinger(c *gin.Context) {
 		}
 	}
 
-	// 3. 配置 SSH 客户端
+	// 5. 配置 SSH 客户端
 	config := &ssh.ClientConfig{
 		User: params.Username,
 		Auth: []ssh.AuthMethod{
+			//ssh.Password(params.Password),
 			ssh.PublicKeys(signer), // 使用私钥认证
 		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // 生产环境应改为 ssh.FixedHostKey
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // 生产环境应改为 ssh.FixedHostKey // 开发环境改为ssh.InsecureIgnoreHostKey()
 		Timeout:         10 * time.Second,
 	}
 
-	// 4. 建立连接
+	// 6.建立 SSH 连接
 	sshClient, errC := ssh.Dial("tcp", params.Host+":22", config)
 	if errC != nil {
 		ws.WriteJSON(map[string]string{"error": "SSH连接失败: " + errC.Error()})
@@ -195,12 +195,12 @@ func HandleWebSSHSinger(c *gin.Context) {
 	}
 	defer session.Close()
 
-	// 绑定标准输入输出
+	// 7. 绑定标准输入输出
 	session.Stdout = &sshWriter{ws: ws}
 	session.Stderr = &sshWriter{ws: ws}
 	stdinPipe, _ := session.StdinPipe()
 
-	// 设置终端参数
+	// 8. 设置终端参数并启动 Shell
 	modes := ssh.TerminalModes{
 		ssh.ECHO:          1,     // 启用回显
 		ssh.TTY_OP_ISPEED: 14400, // 输入速度
@@ -217,7 +217,7 @@ func HandleWebSSHSinger(c *gin.Context) {
 		return
 	}
 
-	// 转发WebSocket消息到SSH
+	// 9. 转发 WebSocket 消息到 SSH
 	for {
 		_, msg, err := ws.ReadMessage()
 		if err != nil {

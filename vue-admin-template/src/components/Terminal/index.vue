@@ -66,7 +66,6 @@ export default {
 
       this.socket.onclose = () => {
         sessionStorage.removeItem('sshParams')
-        console.log(sessionStorage.getItem('sshParams'))
         this.term.writeln('\r\n连接已关闭')
       }
     },

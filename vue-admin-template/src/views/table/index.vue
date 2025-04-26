@@ -218,7 +218,7 @@ export default {
         password: 'sls123'
       }
       // 1. 先存储到 Vuex，注意因为 Vuex 是单页面存储，不能跨页面使用
-      // this.$store.commit('terminal/setSSHParams', params)
+      this.$store.commit('terminal/setSSHParams', params)
       sessionStorage.setItem('sshParams', JSON.stringify(params))
       // 2. 打开新窗口（不带敏感参数）
       const route = this.$router.resolve({ name: 'Terminal' })
