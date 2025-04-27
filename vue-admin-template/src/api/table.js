@@ -34,3 +34,43 @@ export function getOneByID(ip) {
     method: 'get'
   })
 }
+export function countServer() {
+  return request({
+    url: '/api/v1/server/count',
+    method: 'get'
+  })
+}
+export function onlineServer() {
+  return request({
+    url: '/api/v1/server/count/online',
+    method: 'get'
+  })
+}
+export function offlineServer() {
+  return request({
+    url: '/api/v1/server/count/offline',
+    method: 'get'
+  })
+}
+export function wsSSHConnect(host, username, password) {
+  return function() {
+    this.socket = new WebSocket('ws://localhost:8080/api/v1/ssh/connect')
+    this.socket.onopen = () => {
+      // 发送SSH连接参数
+      this.socket.send(JSON.stringify({
+        host: host,
+        username: username,
+        password: password // 实际项目应使用加密传输
+      }))
+    }
+
+    this.socket.onmessage = (event) => {
+      this.term.write(event.data)
+    }
+
+    this.socket.onclose = () => {
+      sessionStorage.removeItem('sshParams')
+      this.term.writeln('\r\n连接已关闭')
+    }
+  }
+}

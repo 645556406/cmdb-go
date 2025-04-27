@@ -1,18 +1,55 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ name }}</div>
+    <div>
+      <el-row :gutter="12" style=" font-weight: bold;">
+        <el-col :span="8">
+          <el-card shadow="hover" style="color: blue;">
+            服务器数量：{{ total }}
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card shadow="hover" style="color: green;">
+            在线：{{ online }}
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card shadow="hover" style="color: red;">
+            离线：{{ offline }}
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { countServer, onlineServer, offlineServer } from '@/api/table'
 
 export default {
   name: 'Dashboard',
-  computed: {
-    ...mapGetters([
-      'name'
-    ])
+  data() {
+    return {
+      total: 0,
+      online: 0,
+      offline: 0
+    }
+  },
+  created() {
+    setInterval(this.fetchCountServer, 10000)
+    this.fetchCountServer()
+  },
+  methods: {
+    fetchCountServer() {
+      countServer().then(response => {
+        this.total = response.data
+      })
+      onlineServer().then(response => {
+        this.online = response.data
+      })
+      offlineServer().then(response => {
+        this.offline = response.data
+      })
+    }
   }
 }
 </script>

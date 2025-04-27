@@ -7,6 +7,7 @@
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import 'xterm/css/xterm.css'
+// import { wsSSHConnect } from '@/api/table'
 
 export default {
   // eslint-disable-next-line vue/require-prop-types
@@ -50,7 +51,8 @@ export default {
       //   return
       // }
       const { host, username, password } = JSON.parse(sessionStorage.getItem('sshParams'))
-      this.socket = new WebSocket('ws://localhost:8080/api/v1/ssh/connect')
+      // wsSSHConnect(host, username, password)
+      this.socket = new WebSocket('http://localhost:8080/api/v1/ssh/connect')
       this.socket.onopen = () => {
         // 发送SSH连接参数
         this.socket.send(JSON.stringify({

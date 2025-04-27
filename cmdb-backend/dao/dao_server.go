@@ -168,3 +168,97 @@ func GetServerOneByIP(ip string) (model.Server, error) {
 		return server, nil
 	}
 }
+
+func GetServerCount() (int, error) {
+	db := NewDB()
+	sqlDB, errDb := db.DB()
+	if errDb != nil {
+		log.Println(errDb)
+	}
+	// Close
+	defer func(sqlDB *sql.DB) {
+		err := sqlDB.Close()
+		if err != nil {
+
+		}
+	}(sqlDB)
+	var servers []model.Server
+	result := db.Find(&servers).RowsAffected
+	return int(result), nil
+}
+
+func GetOnlineCountServer() (int, error) {
+	db := NewDB()
+	sqlDB, errDb := db.DB()
+	if errDb != nil {
+		log.Println(errDb)
+	}
+	// Close
+	defer func(sqlDB *sql.DB) {
+		err := sqlDB.Close()
+		if err != nil {
+
+		}
+	}(sqlDB)
+	var servers []model.Server
+	result := db.Where("status=?", 1).Find(&servers).RowsAffected
+	return int(result), nil
+}
+
+func GetOfflineCountServer() (int, error) {
+	db := NewDB()
+	sqlDB, errDb := db.DB()
+	if errDb != nil {
+		log.Println(errDb)
+	}
+	// Close
+	defer func(sqlDB *sql.DB) {
+		err := sqlDB.Close()
+		if err != nil {
+
+		}
+	}(sqlDB)
+	var servers []model.Server
+	result := db.Where("status=?", 0).Find(&servers).RowsAffected
+	return int(result), nil
+}
+
+func GetServerIPList() ([]model.Server, error) {
+	db := NewDB()
+	sqlDB, errDb := db.DB()
+	if errDb != nil {
+		log.Println(errDb)
+	}
+	// Close
+	defer func(sqlDB *sql.DB) {
+		err := sqlDB.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}(sqlDB)
+	var servers []model.Server
+	db.Select("ID", "IP").Find(&servers)
+	return servers, nil
+}
+
+func UpdateServerStatus(id uint, s int) {
+	db := NewDB()
+	sqlDB, errDb := db.DB()
+	if errDb != nil {
+		log.Println(errDb)
+	}
+	// Close
+	defer func(sqlDB *sql.DB) {
+		err := sqlDB.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}(sqlDB)
+	var servers model.Server
+	servers.Status = s
+	err := db.Model(&model.Server{}).Where("id = ?", id).Select("Status").Updates(servers).Error
+	if err != nil {
+		log.Println(err)
+	}
+	return
+}

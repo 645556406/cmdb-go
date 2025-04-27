@@ -40,6 +40,12 @@ module.exports = {
         //   '^/api': '' // 移除请求路径中的 /api 前缀（可选）
         // }
       }
+      // '/socket': {
+      //   target: 'ws://127.0.0.1:8080', // WebSocket 服务端口
+      //   ws: true,
+      //   changeOrigin: true,
+      //   pathRewrite: { '^/socket': '' }
+      // }
     },
     port: port,
     open: true,
