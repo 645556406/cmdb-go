@@ -15,3 +15,11 @@
 2.1 linux SSH 登录    
 2.1.1 通过密码远程登录 linux 服务器  
 2.1.2 通过密钥远程登录 linux 服务器
+
+
+3. 操作示例：  
+
+![img.png](cmdb-backend/docs/images/img.png)  
+
+点击 **安全连接**  远程 SSH 登录  
+![img.png](cmdb-backend/docs/images/img1.png)  
