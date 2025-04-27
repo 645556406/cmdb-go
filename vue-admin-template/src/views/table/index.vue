@@ -214,8 +214,8 @@ export default {
       console.log(row.IP)
       const params = {
         host: row.IP,
-        username: 'root',
-        password: 'sls123'
+        username: 'root'
+        // password: 'sls123'
       }
       // 1. 先存储到 Vuex，注意因为 Vuex 是单页面存储，不能跨页面使用
       this.$store.commit('terminal/setSSHParams', params)

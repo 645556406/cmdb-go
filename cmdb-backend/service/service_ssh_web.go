@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"golang.org/x/crypto/ssh"
@@ -148,7 +147,6 @@ func HandleWebSSHSinger(c *gin.Context) {
 	}
 	// 3. 读取并解析私钥文件
 	privateKeyBytes, err := ioutil.ReadFile("/Users/wangye/.ssh/id_rsa")
-	fmt.Println(string(privateKeyBytes))
 	if err != nil {
 		return
 	}
@@ -159,7 +157,7 @@ func HandleWebSSHSinger(c *gin.Context) {
 		// 如果私钥有密码，尝试解密
 		if _, ok := errSSH.(*ssh.PassphraseMissingError); ok {
 			// 尝试使用密码解密私钥(如果有的话这里需要修改下ssh私钥密码，没有就可以忽略了)
-			signer, err = decryptPrivateKey(privateKeyBytes, "your-passphrase")
+			signer, err = decryptPrivateKey(privateKeyBytes, "")
 			if err != nil {
 				return
 			}
@@ -167,15 +165,20 @@ func HandleWebSSHSinger(c *gin.Context) {
 			return
 		}
 	}
-
+	// 从文件或硬编码字符串加载公钥
+	hostKeyBytes := []byte("ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDfaXDYGmZKVsbaPxrSfcQUyX88U3BpUrtSvIIBJ4n2dl9GYX/JLTVffsQ7cUkmIqzrs0lOpf+fke2M0S/mQmZ3GeQILf6oc7Zk9+Oh7o8pAE5UZGcW/FSYvqM2nzrCu3WRkfa6L4VENDSaCC7tiVM0ptwwxKvQ1pkk6KfMAFqd32HL7EwrhgROeLFnvTLGYKfgy1suU3LU3crFb6EnNCLAttp+apqj7dnmTHh5kkPDXz62JuFHLniLsVAMmZfPb7QM2A7D9SPJlh0OYAw+LcX9nrMiIwq/9IlMvT2d9E6oHZ1Xytj9RMnrVO0B50+Rxu9kVSejlLzEdb7p/XBeU84YQteIkvHjN1KfYmC22Ow6OnL9ENEFSbNLutsuBQe6QSYvAzUUkhTVlI36ds3tdfJsmkMX5XM9DWTw9zPAUIaLuTVnsJoWHyxSPpJPSuzZpBV5FCCG3BVC7W0+TVmwSGHl+rMs2BdKQDR2GGna1mIaUAfgABNJO3TDNGo7O3h0Wzs=") // 替换为实际公钥
+	hostKey, _, _, _, err := ssh.ParseAuthorizedKey(hostKeyBytes)
+	if err != nil {
+		log.Fatal("解析公钥失败:", err)
+	}
 	// 5. 配置 SSH 客户端
 	config := &ssh.ClientConfig{
-		User: params.Username,
+		User:              params.Username,
+		HostKeyAlgorithms: []string{"ssh-rsa", "rsa-sha2-256"}, // 指定主机密钥算法,不然可以出现解密失败的问题
 		Auth: []ssh.AuthMethod{
-			//ssh.Password(params.Password),
 			ssh.PublicKeys(signer), // 使用私钥认证
 		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // 生产环境应改为 ssh.FixedHostKey // 开发环境改为ssh.InsecureIgnoreHostKey()
+		HostKeyCallback: ssh.FixedHostKey(hostKey), // 生产环境应改为 ssh.FixedHostKey // 开发环境改为ssh.InsecureIgnoreHostKey()
 		Timeout:         10 * time.Second,
 	}
 
@@ -206,7 +209,7 @@ func HandleWebSSHSinger(c *gin.Context) {
 		ssh.TTY_OP_ISPEED: 14400, // 输入速度
 		ssh.TTY_OP_OSPEED: 14400, // 输出速度
 	}
-	if err := session.RequestPty("xterm", 80, 40, modes); err != nil {
+	if err := session.RequestPty("xterm", 55, 180, modes); err != nil {
 		log.Println("PTY请求失败:", err)
 		return
 	}
