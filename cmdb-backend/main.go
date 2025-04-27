@@ -2,11 +2,14 @@ package main
 
 import (
 	"cmdb-backend/api"
+	"cmdb-backend/dao"
 	"cmdb-backend/service"
 	"github.com/gin-contrib/cors"
 )
 
 func main() {
+	// 初始化数据库
+	dao.NewDB()
 	// 初始化引擎
 	r := api.NewRouter()
 	r.Use(cors.Default())

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"cmdb-backend/dao"
+	"cmdb-backend/utils"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -145,8 +147,16 @@ func HandleWebSSHSinger(c *gin.Context) {
 		log.Println("参数解析失败:", err)
 		return
 	}
+	// 加载配置文件，获取私钥路径
+	configYaml := utils.LoadYamlConfigNew("config/dev.yaml")
+	privateKeyPath := configYaml["SSHPrivateKey"].(map[string]interface{})["path"].(string)
+	if privateKeyPath == "" {
+		log.Println("私钥路径为空")
+		return
+	}
+	log.Println("私钥路径:", privateKeyPath)
 	// 3. 读取并解析私钥文件
-	privateKeyBytes, err := ioutil.ReadFile("/Users/wangye/.ssh/id_rsa")
+	privateKeyBytes, err := ioutil.ReadFile(privateKeyPath)
 	if err != nil {
 		return
 	}
@@ -165,8 +175,22 @@ func HandleWebSSHSinger(c *gin.Context) {
 			return
 		}
 	}
+	// 获取主机公钥
+	host := params.Host
+	log.Println("主机:", host)
+	serverInfo, err := dao.GetServerOneByIP(host)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	publicKey := serverInfo.PublicKey
+	if publicKey == "" {
+		log.Println("主机公钥为空")
+		return
+	}
 	// 从文件或硬编码字符串加载公钥
-	hostKeyBytes := []byte("ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDfaXDYGmZKVsbaPxrSfcQUyX88U3BpUrtSvIIBJ4n2dl9GYX/JLTVffsQ7cUkmIqzrs0lOpf+fke2M0S/mQmZ3GeQILf6oc7Zk9+Oh7o8pAE5UZGcW/FSYvqM2nzrCu3WRkfa6L4VENDSaCC7tiVM0ptwwxKvQ1pkk6KfMAFqd32HL7EwrhgROeLFnvTLGYKfgy1suU3LU3crFb6EnNCLAttp+apqj7dnmTHh5kkPDXz62JuFHLniLsVAMmZfPb7QM2A7D9SPJlh0OYAw+LcX9nrMiIwq/9IlMvT2d9E6oHZ1Xytj9RMnrVO0B50+Rxu9kVSejlLzEdb7p/XBeU84YQteIkvHjN1KfYmC22Ow6OnL9ENEFSbNLutsuBQe6QSYvAzUUkhTVlI36ds3tdfJsmkMX5XM9DWTw9zPAUIaLuTVnsJoWHyxSPpJPSuzZpBV5FCCG3BVC7W0+TVmwSGHl+rMs2BdKQDR2GGna1mIaUAfgABNJO3TDNGo7O3h0Wzs=") // 替换为实际公钥
+	//hostKeyBytes := []byte("ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDfaXDYGmZKVsbaPxrSfcQUyX88U3BpUrtSvIIBJ4n2dl9GYX/JLTVffsQ7cUkmIqzrs0lOpf+fke2M0S/mQmZ3GeQILf6oc7Zk9+Oh7o8pAE5UZGcW/FSYvqM2nzrCu3WRkfa6L4VENDSaCC7tiVM0ptwwxKvQ1pkk6KfMAFqd32HL7EwrhgROeLFnvTLGYKfgy1suU3LU3crFb6EnNCLAttp+apqj7dnmTHh5kkPDXz62JuFHLniLsVAMmZfPb7QM2A7D9SPJlh0OYAw+LcX9nrMiIwq/9IlMvT2d9E6oHZ1Xytj9RMnrVO0B50+Rxu9kVSejlLzEdb7p/XBeU84YQteIkvHjN1KfYmC22Ow6OnL9ENEFSbNLutsuBQe6QSYvAzUUkhTVlI36ds3tdfJsmkMX5XM9DWTw9zPAUIaLuTVnsJoWHyxSPpJPSuzZpBV5FCCG3BVC7W0+TVmwSGHl+rMs2BdKQDR2GGna1mIaUAfgABNJO3TDNGo7O3h0Wzs=") // 替换为实际公钥
+	hostKeyBytes := []byte(publicKey)
 	hostKey, _, _, _, err := ssh.ParseAuthorizedKey(hostKeyBytes)
 	if err != nil {
 		log.Fatal("解析公钥失败:", err)

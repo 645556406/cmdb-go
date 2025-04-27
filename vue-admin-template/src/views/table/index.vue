@@ -26,6 +26,15 @@
           <el-form-item label="OS">
             <el-input v-model="form.OS" />
           </el-form-item>
+          <el-form-item label="Area">
+            <el-input v-model="form.Area" />
+          </el-form-item>
+          <el-form-item label="Password">
+            <el-input v-model="form.Password" type="password" />
+          </el-form-item>
+          <el-form-item label="PublicKey">
+            <el-input v-model="form.PublicKey" />
+          </el-form-item>
         </el-form>
         <span slot="footer">
           <el-button @click="dialogVisible = false">取消</el-button>
@@ -84,12 +93,27 @@
             {{ scope.row.Owner }}
           </template>
         </el-table-column>
+        <el-table-column label="Area ">
+          <template slot-scope="scope">
+            {{ scope.row.Area }}
+          </template>
+        </el-table-column>
+        <el-table-column label="Password ">
+          <template slot-scope="scope">
+            {{ scope.row.Password }}
+          </template>
+        </el-table-column>
+        <el-table-column label="PublicKey ">
+          <template slot-scope="scope">
+            {{ truncateText(scope.row.PublicKey) }}
+          </template>
+        </el-table-column>
         <el-table-column label="Status ">
           <template slot-scope="scope">
             {{ scope.row.Status }}
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="created_at" label="CreateTime" width="250">
+        <!-- <el-table-column align="center" prop="created_at" label="CreateTime" width="250">
           <template slot-scope="scope">
             <i class="el-icon-time" />
             <span>{{ scope.row.CreatedAt }}</span>
@@ -100,7 +124,7 @@
             <i class="el-icon-time" />
             <span>{{ scope.row.UpdatedAt }}</span>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column align="center" label="Actions" width="250" fixed="right" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" @click="openTerminalSafe(scope.row)">安全连接</el-button>
@@ -144,6 +168,15 @@
             </el-form-item>
             <el-form-item label="Owner" :label-width="formLabelWidth">
               <el-input v-model="row.Owner" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="Password" :label-width="formLabelWidth">
+              <el-input v-model="row.Password" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="Area" :label-width="formLabelWidth">
+              <el-input v-model="row.Area" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="PublicKey" :label-width="formLabelWidth">
+              <el-input v-model="row.PublicKey" autocomplete="off" />
             </el-form-item>
           </el-form>
           <div class="demo-drawer__footer">
@@ -210,6 +243,9 @@ export default {
     this.fetchData()
   },
   methods: {
+    truncateText(text) {
+      return text.length > 15 ? text.slice(0, 15) + '...' : text
+    },
     openTerminalSafe(row) {
       console.log(row.IP)
       const params = {
