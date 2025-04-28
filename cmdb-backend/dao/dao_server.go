@@ -54,11 +54,27 @@ func UpdateServer(server model.Server) error {
 	}
 	if server.Memory > 0 {
 		serverUpdate.Memory = server.Memory
-		serverFields = append(serverFields, "CPU")
+		serverFields = append(serverFields, "Memory")
 	}
 	if server.IP != "" {
 		serverUpdate.IP = server.IP
 		serverFields = append(serverFields, "IP")
+	}
+	if server.IP != "" {
+		serverUpdate.Username = server.Username
+		serverFields = append(serverFields, "Username")
+	}
+	if server.IP != "" {
+		serverUpdate.Password = server.Password
+		serverFields = append(serverFields, "Password")
+	}
+	if server.IP != "" {
+		serverUpdate.Area = server.Area
+		serverFields = append(serverFields, "Area")
+	}
+	if server.IP != "" {
+		serverUpdate.PublicKey = server.PublicKey
+		serverFields = append(serverFields, "PublicKey")
 	}
 	if server.Env != "" {
 		serverUpdate.Env = server.Env
@@ -72,6 +88,7 @@ func UpdateServer(server model.Server) error {
 		serverUpdate.Owner = server.Owner
 		serverFields = append(serverFields, "Owner")
 	}
+	log.Println(serverUpdate, serverFields)
 	err := db.Model(&model.Server{}).Where("id = ?", server.ID).Select(serverFields).Updates(serverUpdate).Error
 	if err != nil {
 		log.Println(err)

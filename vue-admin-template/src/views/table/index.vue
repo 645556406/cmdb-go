@@ -29,6 +29,9 @@
           <el-form-item label="Area">
             <el-input v-model="form.Area" />
           </el-form-item>
+          <el-form-item label="Username">
+            <el-input v-model="form.Username" />
+          </el-form-item>
           <el-form-item label="Password">
             <el-input v-model="form.Password" type="password" />
           </el-form-item>
@@ -58,7 +61,7 @@
             {{ scope.row.ID }}
           </template>
         </el-table-column>
-        <el-table-column label="HostName" min-width="120">
+        <el-table-column label="HostName" align="center" min-width="120">
           <template slot-scope="scope">
             {{ scope.row.Hostname }}
           </template>
@@ -78,37 +81,42 @@
             <el-tag :type="scope.row.status | statusFilter">{{ scope.row.OS }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="CPU ">
+        <el-table-column label="CPU" align="center">
           <template slot-scope="scope">
             {{ scope.row.CPU }}
           </template>
         </el-table-column>
-        <el-table-column label="Memory ">
+        <el-table-column label="Memory" align="center">
           <template slot-scope="scope">
             {{ scope.row.Memory }}
           </template>
         </el-table-column>
-        <el-table-column label="Owner ">
+        <el-table-column label="Owner" align="center">
           <template slot-scope="scope">
             {{ scope.row.Owner }}
           </template>
         </el-table-column>
-        <el-table-column label="Area ">
+        <el-table-column label="Area" align="center">
           <template slot-scope="scope">
             {{ scope.row.Area }}
           </template>
         </el-table-column>
-        <el-table-column label="Password ">
+        <el-table-column label="Username" align="center">
+          <template slot-scope="scope">
+            {{ scope.row.Username }}
+          </template>
+        </el-table-column>
+        <el-table-column label="Password" align="center">
           <template slot-scope="scope">
             {{ scope.row.Password }}
           </template>
         </el-table-column>
-        <el-table-column label="PublicKey ">
+        <el-table-column label="PublicKey" align="center">
           <template slot-scope="scope">
             {{ truncateText(scope.row.PublicKey) }}
           </template>
         </el-table-column>
-        <el-table-column label="Status ">
+        <el-table-column label="Status" align="center">
           <template slot-scope="scope">
             {{ scope.row.Status }}
           </template>
@@ -169,6 +177,9 @@
             <el-form-item label="Owner" :label-width="formLabelWidth">
               <el-input v-model="row.Owner" autocomplete="off" />
             </el-form-item>
+            <el-form-item label="Username" :label-width="formLabelWidth">
+              <el-input v-model="row.Username" autocomplete="off" />
+            </el-form-item>
             <el-form-item label="Password" :label-width="formLabelWidth">
               <el-input v-model="row.Password" autocomplete="off" />
             </el-form-item>
@@ -186,6 +197,7 @@
         </div>
       </el-drawer>
     </div>
+    <br>
     <div>
       <el-pagination
         :current-page="currentPage"
@@ -250,7 +262,7 @@ export default {
       console.log(row.IP)
       const params = {
         host: row.IP,
-        username: 'root'
+        username: row.Username
         // password: 'sls123'
       }
       // 1. 先存储到 Vuex，注意因为 Vuex 是单页面存储，不能跨页面使用
@@ -320,15 +332,19 @@ export default {
           this.loading = true
           // 提交前明确转换数据类型
           const payload = {
-            ID: Number(this.row.id),
-            HostName: String(this.row.HostName),
+            ID: Number(this.row.ID),
+            HostName: String(this.row.Hostname),
             CPU: Number(this.row.CPU),
             IP: String(this.row.IP),
             OS: String(this.row.OS),
             Memory: Number(this.row.Memory),
             Owner: String(this.row.Owner),
             Env: String(this.row.Env),
-            Status: Number(this.row.Status)
+            Status: Number(this.row.Status),
+            Username: String(this.row.Username),
+            Password: String(this.row.Password),
+            Area: String(this.row.Area),
+            PublicKey: String(this.row.PublicKey)
           }
           // 调用提交方法
           updateServer(payload).then(response => {

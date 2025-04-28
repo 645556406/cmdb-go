@@ -7,6 +7,7 @@ type Server struct {
 	Hostname  string `gorm:"unique;not null"` // 主机名
 	IP        string `gorm:"unique"`          // IP 地址
 	Port      int    // 端口号
+	Username  string // 用户名
 	Password  string // 密码
 	PublicKey string // 公钥
 	OS        string // 操作系统

@@ -240,7 +240,7 @@ func UpdateServerStatus(server model.Server) {
 		result = CheckServerStatus(server.IP)
 	}
 	if result {
-		log.Println("Ping success:", server.IP)
+		//log.Println("Ping success:", server.IP)
 		dao.UpdateServerStatus(server.ID, 1)
 	} else {
 		dao.UpdateServerStatus(server.ID, 0)
