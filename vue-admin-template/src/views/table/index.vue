@@ -121,7 +121,7 @@
             {{ scope.row.Status }}
           </template>
         </el-table-column>
-        <!-- <el-table-column align="center" prop="created_at" label="CreateTime" width="250">
+        <el-table-column align="center" prop="created_at" label="CreateTime" width="250">
           <template slot-scope="scope">
             <i class="el-icon-time" />
             <span>{{ scope.row.CreatedAt }}</span>
@@ -132,7 +132,7 @@
             <i class="el-icon-time" />
             <span>{{ scope.row.UpdatedAt }}</span>
           </template>
-        </el-table-column> -->
+        </el-table-column>
         <el-table-column align="center" label="Actions" width="250" fixed="right" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" @click="openTerminalSafe(scope.row)">安全连接</el-button>
@@ -285,6 +285,14 @@ export default {
     // 搜索还是有问题
     searchOneByIP() {
       this.listLoading = true
+      if (this.searchQuery.trim() === '') {
+        this.$message({
+          type: 'error',
+          message: '请填写 IP 地址'
+        })
+        this.listLoading = false
+        return
+      }
       getOneByID(this.searchQuery.trim()).then((response) => {
         if (response.code === 20000) {
           const serverList = []
