@@ -23,3 +23,6 @@
 
 点击 **安全连接**  远程 SSH 登录  
 ![img.png](cmdb-backend/docs/images/img1.png)  
+
+参考地址：  
+- 前端参考： https://github.com/PanJiaChen/vue-admin-template  

@@ -52,9 +52,15 @@ export function offlineServer() {
     method: 'get'
   })
 }
+// WebSocket 连接封装
+export function initWebSocket() {
+  return new WebSocket(process.env.VUE_APP_WS_API + '/api/v1/ssh/connect')
+}
+
 export function wsSSHConnect(host, username, password) {
-  return function() {
-    this.socket = new WebSocket('ws://localhost:8080/api/v1/ssh/connect')
+  return function wsSSHConnectNew() {
+    this.socket = initWebSocket()
+    // this.socket = new WebSocket('ws://localhost:8080/api/v1/ssh/connect')
     this.socket.onopen = () => {
       // 发送SSH连接参数
       this.socket.send(JSON.stringify({
