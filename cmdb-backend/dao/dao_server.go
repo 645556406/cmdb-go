@@ -88,6 +88,10 @@ func UpdateServer(server model.Server) error {
 		serverUpdate.Owner = server.Owner
 		serverFields = append(serverFields, "Owner")
 	}
+	if server.Port > 0 {
+		serverUpdate.Port = server.Port
+		serverFields = append(serverFields, "Port")
+	}
 	err := db.Model(&model.Server{}).Where("id = ?", server.ID).Select(serverFields).Updates(serverUpdate).Error
 	if err != nil {
 		log.Println(err)

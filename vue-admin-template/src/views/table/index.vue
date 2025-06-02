@@ -35,6 +35,9 @@
           <el-form-item label="Password">
             <el-input v-model="form.Password" type="password" />
           </el-form-item>
+          <el-form-item label="Port">
+            <el-input v-model="form.Port" type="password" />
+          </el-form-item>
           <el-form-item label="PublicKey">
             <el-input v-model="form.PublicKey" />
           </el-form-item>
@@ -66,7 +69,7 @@
             {{ scope.row.Hostname }}
           </template>
         </el-table-column>
-        <el-table-column label="IP" align="center" min-width="120">
+        <el-table-column label="IP" align="center" min-width="150">
           <template slot-scope="scope">
             <span>{{ scope.row.IP }}</span>
           </template>
@@ -76,7 +79,7 @@
             {{ scope.row.Env }}
           </template>
         </el-table-column>
-        <el-table-column class-name="status-col" label="OS" align="center">
+        <el-table-column class-name="status-col" label="OS" align="center" width="100">
           <template slot-scope="scope">
             <el-tag :type="scope.row.status | statusFilter">{{ scope.row.OS }}</el-tag>
           </template>
@@ -111,7 +114,12 @@
             {{ scope.row.Password }}
           </template>
         </el-table-column>
-        <el-table-column label="PublicKey" align="center">
+        <el-table-column label="Port" align="center">
+          <template slot-scope="scope">
+            {{ scope.row.Port }}
+          </template>
+        </el-table-column>
+        <el-table-column label="PublicKey" align="center" width="200">
           <template slot-scope="scope">
             {{ truncateText(scope.row.PublicKey) }}
           </template>
@@ -182,6 +190,9 @@
             </el-form-item>
             <el-form-item label="Password" :label-width="formLabelWidth">
               <el-input v-model="row.Password" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="Port" :label-width="formLabelWidth">
+              <el-input v-model="row.Port" autocomplete="off" />
             </el-form-item>
             <el-form-item label="Area" :label-width="formLabelWidth">
               <el-input v-model="row.Area" autocomplete="off" />
@@ -301,7 +312,7 @@ export default {
           this.listLoading = false
         } else {
           this.$message({
-            type: 'faild',
+            type: 'error',
             message: response.message
           })
         }
@@ -322,7 +333,7 @@ export default {
           this.fetchData()
         } else {
           this.$message({
-            type: 'faild',
+            type: 'error',
             message: response.message
           })
         }
@@ -351,6 +362,7 @@ export default {
             Status: Number(this.row.Status),
             Username: String(this.row.Username),
             Password: String(this.row.Password),
+            Port: Number(this.row.Port),
             Area: String(this.row.Area),
             PublicKey: String(this.row.PublicKey)
           }
@@ -407,7 +419,7 @@ export default {
             this.fetchData()
           } else {
             this.$message({
-              type: 'faild',
+              type: 'error',
               message: response.message
             })
           }

@@ -230,6 +230,7 @@ func MacPing(ip string) bool {
 	return true
 }
 
+// UpdateServerStatus 函数用于更新服务器的状态。
 func UpdateServerStatus(server model.Server) {
 	var result bool
 	switch runtime.GOOS {
@@ -242,6 +243,7 @@ func UpdateServerStatus(server model.Server) {
 	if result {
 		//log.Println("Ping success:", server.IP)
 		dao.UpdateServerStatus(server.ID, 1)
+		//GetLinuxConfig(server)
 	} else {
 		dao.UpdateServerStatus(server.ID, 0)
 	}
@@ -259,14 +261,11 @@ func StartServerStatusCheck(interval time.Duration) {
 	for {
 		select {
 		case <-ticker.C:
-			serverList, err := GetServerIPList()
-			if err != nil {
-				log.Println(err)
-			} else {
-				for _, server := range serverList {
-					wg.Add(1)
-					go UpdateServerStatus(server)
-				}
+			serverList := dao.GetServerList()
+			for _, server := range serverList {
+				wg.Add(1)
+				go UpdateServerStatus(server)
+				//wg.Wait()
 			}
 		}
 	}

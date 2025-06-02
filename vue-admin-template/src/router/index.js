@@ -67,19 +67,25 @@ export const constantRoutes = [
         name: 'Table',
         component: () => import('@/views/table/index'),
         meta: { title: 'Server', icon: 'table' }
-      }
-      // {
-      //   path: 'tree',
-      //   name: 'Tree',
-      //   component: () => import('@/views/tree/index'),
-      //   meta: { title: 'Tree', icon: 'tree' }
-      // },
+      },
+      {
+        path: 'tree',
+        name: 'Tree',
+        component: () => import('@/views/tree/index'),
+        meta: { title: 'Tree', icon: 'tree' }
+      },
       // {
       //   path: 'ssh',
       //   name: 'SSH',
       //   component: () => import('@/components/Terminal/index'),
-      //   meta: { title: 'SSH', icon: 'ssh' }
-      // }
+      //   meta: { title: 'SSH', icon: 'el-icon-s-platform' }
+      // },
+      {
+        path: 'router',
+        name: 'Router',
+        component: () => import('@/components/Terminal/index'),
+        meta: { title: 'Router', icon: 'el-icon-more' }
+      }
     ]
   },
   {
