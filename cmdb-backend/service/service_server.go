@@ -3,8 +3,6 @@ package service
 import (
 	"cmdb-backend/dao"
 	"cmdb-backend/model"
-	"github.com/gin-gonic/gin"
-	"github.com/go-ping/ping"
 	"log"
 	"net/http"
 	"os/exec"
@@ -13,6 +11,9 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-ping/ping"
 )
 
 type Response struct {
