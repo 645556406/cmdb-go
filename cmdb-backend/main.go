@@ -4,15 +4,16 @@ import (
 	"cmdb-backend/api"
 	"cmdb-backend/dao"
 	"cmdb-backend/service"
+
 	"github.com/gin-contrib/cors"
-	"time"
 )
 
 func main() {
 	// 初始化数据库
 	dao.NewDB()
+	// dao.InitDB()
 	// 启动异步定时任务，每30秒检查一次服务器状态，并更新数据库
-	go service.StartServerStatusCheck(10 * time.Second)
+	// go service.StartServerStatusCheck(10 * time.Second)
 	// 初始化引擎
 	r := api.NewRouter()
 	r.Use(cors.Default())

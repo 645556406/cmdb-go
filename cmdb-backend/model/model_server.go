@@ -2,6 +2,7 @@ package model
 
 import "gorm.io/gorm"
 
+// Server 服务器信息表
 type Server struct {
 	gorm.Model
 	Hostname  string `gorm:"unique;not null"` // 主机名
