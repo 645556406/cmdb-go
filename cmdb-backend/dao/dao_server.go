@@ -21,7 +21,7 @@ func GetServerList() []model.Server {
 		}
 	}(sqlDB)
 	var serverList []model.Server
-	err := db.Where("delete_at = ", "").Find(&serverList).Error
+	err := db.Where("deleted_at IS NULL").Find(&serverList).Error
 	if err != nil {
 		log.Println(err)
 	}
