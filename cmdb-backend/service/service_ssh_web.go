@@ -127,7 +127,7 @@ func (w *sshWriter) Write(p []byte) (n int, err error) {
 // c *gin.Context: gin框架的上下文对象，用于处理HTTP请求和响应。
 func HandleWebSSHSinger(c *gin.Context) {
 	log.Println("收到连接请求")
-	//1. 升级HTTP连接为WebSocket
+	// 1. 升级HTTP连接为WebSocket
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
