@@ -36,37 +36,39 @@ export const constantRoutes = [
     component: () => import('@/views/login/index'),
     hidden: true
   },
-
   {
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true
   },
-
+  {
+    path: '/logout',
+    redirect: '/login',
+    hidden: true
+  },
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: 'dashboard',
     children: [{
       path: 'dashboard',
-      name: 'Dashboard',
+      name: '首页',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '仪表盘', icon: 'dashboard' }
     }]
   },
-
   {
     path: '/cmdb',
     component: Layout,
-    redirect: '/cmdb/table',
-    name: 'CMDB',
-    meta: { title: 'CMDB', icon: 'el-icon-s-help' },
+    redirect: 'table',
+    name: '配置管理',
+    meta: { title: '配置管理', icon: 'el-icon-s-help' },
     children: [
       {
         path: 'table',
         name: 'Table',
         component: () => import('@/views/table/index'),
-        meta: { title: 'Server', icon: 'table' }
+        meta: { title: '服务器', icon: 'table' }
       }
     ]
   },
@@ -88,11 +90,10 @@ export const constantRoutes = [
     children: [
       {
         path: 'https://github.com/645556406/cmdb-go',
-        meta: { title: 'Project Link', icon: 'link' }
+        meta: { title: '项目链接', icon: 'link' }
       }
     ]
   },
-
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

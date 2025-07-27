@@ -27,8 +27,7 @@ func main() {
 		v1.GET("/detail/:id", service.GetServerDetailByID)
 		v1.GET("/get/:ip", service.GetServerOneByIP)
 		v1.GET("/count", service.GetCountServer)
-		v1.GET("/count/online", service.GetOnlineCountServer)
-		v1.GET("/count/offline", service.GetOfflineCountServer)
+		v1.GET("/update", service.HandleWebSocket)
 	}
 	{
 		v2 := r.Group("/api/v1/ssh")

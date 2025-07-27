@@ -40,18 +40,6 @@ export function countServer() {
     method: 'get'
   })
 }
-export function onlineServer() {
-  return request({
-    url: '/api/v1/server/count/online',
-    method: 'get'
-  })
-}
-export function offlineServer() {
-  return request({
-    url: '/api/v1/server/count/offline',
-    method: 'get'
-  })
-}
 // WebSocket 连接封装
 export function initWebSocket() {
   return new WebSocket(process.env.VUE_APP_WS_API + '/api/v1/ssh/connect')

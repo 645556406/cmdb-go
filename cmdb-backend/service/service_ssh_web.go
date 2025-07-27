@@ -4,12 +4,13 @@ import (
 	"cmdb-backend/dao"
 	"cmdb-backend/utils"
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"golang.org/x/crypto/ssh"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -64,8 +65,8 @@ func HandleWebSSHSinger(c *gin.Context) {
 	}
 	log.Println("私钥路径:", privateKeyPath)
 	// 3. 读取并解析私钥文件
-	privateKeyBytes, err := ioutil.ReadFile(privateKeyPath)
-	if err != nil {
+	privateKeyBytes, errReadFile := os.ReadFile(privateKeyPath)
+	if errReadFile != nil {
 		return
 	}
 
@@ -73,14 +74,13 @@ func HandleWebSSHSinger(c *gin.Context) {
 	signer, errSSH := ssh.ParsePrivateKey(privateKeyBytes)
 	if errSSH != nil {
 		// 如果私钥有密码，尝试解密
-		if _, ok := errSSH.(*ssh.PassphraseMissingError); ok {
+		var passphraseMissingError *ssh.PassphraseMissingError
+		if errors.As(errSSH, &passphraseMissingError) {
 			// 尝试使用密码解密私钥(如果有的话这里需要修改下ssh私钥密码，没有就可以忽略了)
 			signer, err = decryptPrivateKey(privateKeyBytes, "")
 			if err != nil {
 				return
 			}
-		} else {
-			return
 		}
 	}
 	// 获取主机公钥
@@ -97,7 +97,6 @@ func HandleWebSSHSinger(c *gin.Context) {
 		return
 	}
 	// 从文件或硬编码字符串加载公钥
-	//hostKeyBytes := []byte("ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDfaXDYGmZKVsbaPxrSfcQUyX88U3BpUrtSvIIBJ4n2dl9GYX/JLTVffsQ7cUkmIqzrs0lOpf+fke2M0S/mQmZ3GeQILf6oc7Zk9+Oh7o8pAE5UZGcW/FSYvqM2nzrCu3WRkfa6L4VENDSaCC7tiVM0ptwwxKvQ1pkk6KfMAFqd32HL7EwrhgROeLFnvTLGYKfgy1suU3LU3crFb6EnNCLAttp+apqj7dnmTHh5kkPDXz62JuFHLniLsVAMmZfPb7QM2A7D9SPJlh0OYAw+LcX9nrMiIwq/9IlMvT2d9E6oHZ1Xytj9RMnrVO0B50+Rxu9kVSejlLzEdb7p/XBeU84YQteIkvHjN1KfYmC22Ow6OnL9ENEFSbNLutsuBQe6QSYvAzUUkhTVlI36ds3tdfJsmkMX5XM9DWTw9zPAUIaLuTVnsJoWHyxSPpJPSuzZpBV5FCCG3BVC7W0+TVmwSGHl+rMs2BdKQDR2GGna1mIaUAfgABNJO3TDNGo7O3h0Wzs=") // 替换为实际公钥
 	hostKeyBytes := []byte(publicKey)
 	hostKey, _, _, _, err := ssh.ParseAuthorizedKey(hostKeyBytes)
 	if err != nil {
@@ -117,18 +116,34 @@ func HandleWebSSHSinger(c *gin.Context) {
 	// 6.建立 SSH 连接
 	sshClient, errC := ssh.Dial("tcp", params.Host+":22", config)
 	if errC != nil {
-		ws.WriteJSON(map[string]string{"error": "SSH连接失败: " + errC.Error()})
+		err := ws.WriteJSON(map[string]string{"error": "SSH连接失败: " + errC.Error()})
+		if err != nil {
+			return
+		}
 		return
 	}
-	defer sshClient.Close()
+	defer func(sshClient *ssh.Client) {
+		err := sshClient.Close()
+		if err != nil {
+
+		}
+	}(sshClient)
 
 	// 创建SSH会话
 	session, err := sshClient.NewSession()
 	if err != nil {
-		ws.WriteJSON(map[string]string{"error": "创建会话失败"})
+		err := ws.WriteJSON(map[string]string{"error": "创建会话失败"})
+		if err != nil {
+			return
+		}
 		return
 	}
-	defer session.Close()
+	defer func(session *ssh.Session) {
+		err := session.Close()
+		if err != nil {
+			return
+		}
+	}(session)
 
 	// 7. 绑定标准输入输出
 	session.Stdout = &sshWriter{ws: ws}
@@ -161,11 +176,20 @@ func HandleWebSSHSinger(c *gin.Context) {
 		// 如果是 resize 消息，不转发到 SSH
 		if strings.HasPrefix(string(msg), `{"type":"resize"`) {
 			var resizeMsg struct{ Cols, Rows int }
-			json.Unmarshal(msg, &resizeMsg)
-			session.WindowChange(resizeMsg.Rows, resizeMsg.Cols) // 调整 PTY 尺寸
-			continue                                             // 跳过后续转发逻辑
+			err := json.Unmarshal(msg, &resizeMsg)
+			if err != nil {
+				return
+			}
+			err = session.WindowChange(resizeMsg.Rows, resizeMsg.Cols)
+			if err != nil {
+				return
+			} // 调整 PTY 尺寸
+			continue // 跳过后续转发逻辑
 		}
-		stdinPipe.Write(msg)
+		_, errStdin := stdinPipe.Write(msg)
+		if errStdin != nil {
+			return
+		}
 	}
 }
 
