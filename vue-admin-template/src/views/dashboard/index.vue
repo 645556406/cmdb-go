@@ -37,32 +37,38 @@ export default {
     }
   },
   mounted() {
-    this.conn = new WebSocket('ws://localhost:8080/api/v1/server/update')
-    this.conn.onmessage = (e) => {
-      this.data = { ...this.data, ...JSON.parse(e.data) }
-    }
-    // var conn = new WebSocket('ws://localhost:8080/api/v1/server/update')
-    // conn.onopen = function(e) {
-    //   console.log('连接已打开')
-    //   conn.send('Hello, World!')
-    // }
-    // conn.onmessage = function(e) {
-    //   console.log('从服务器收到消息:', e.data)
-    //   this.data = JSON.parse(e.data)
-    //   console.log(this.data)
-    // }
-    // conn.onclose = function(e) {
-    //   console.log('连接已关闭')
+    this.initWebSocket()
+    // this.conn = new WebSocket('ws://localhost:8080/api/v1/server/update')
+    // this.conn.onmessage = (e) => {
+    //   this.data = { ...this.data, ...JSON.parse(e.data) }
     // }
   },
   beforeDestroy() {
-    this.socket.disconnect()
+    // this.socket.disconnect()
+    if (this.conn && this.conn.readyState === WebSocket.OPEN) {
+      console.log('WebSocket 连接关闭成功')
+      this.conn.close()
+    }
   },
   methods: {
     fetchCountServer() {
       countServer().then(response => {
         this.data = response.data
       })
+    },
+    initWebSocket() {
+      this.conn = new WebSocket('ws://localhost:8080/api/v1/server/update')
+      this.conn.onopen = () => {
+        console.log('WebSocket 连接建立成功')
+        this.reconnectAttempts = 0
+      }
+      this.conn.onmessage = (e) => {
+        try {
+          this.data = { ...this.data, ...JSON.parse(e.data) }
+        } catch (error) {
+          console.error('消息解析失败: ', error)
+        }
+      }
     }
   }
 }
