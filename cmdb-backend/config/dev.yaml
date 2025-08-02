@@ -11,4 +11,5 @@ DB:
   max_idle_conns: 5
 # SSH 私钥路径
 SSHPrivateKey:
-  path: "/Users/wangye/.ssh/id_rsa"
+#  path: "/Users/wangye/.ssh/id_rsa"
+  path: "cmdb-backend/config/id_rsa"

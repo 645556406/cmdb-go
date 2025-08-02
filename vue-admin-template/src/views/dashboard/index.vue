@@ -4,17 +4,17 @@
       <el-row :gutter="12" style=" font-weight: bold;">
         <el-col :span="8">
           <el-card shadow="hover" style="color: blue;">
-            服务器数量：{{ total }}
+            服务器数量：{{ data.total }}
           </el-card>
         </el-col>
         <el-col :span="8">
           <el-card shadow="hover" style="color: green;">
-            在线：{{ online }}
+            在线：{{ data.online }}
           </el-card>
         </el-col>
         <el-col :span="8">
           <el-card shadow="hover" style="color: red;">
-            离线：{{ offline }}
+            离线：{{ data.offline }}
           </el-card>
         </el-col>
       </el-row>
@@ -23,32 +23,52 @@
 </template>
 
 <script>
-import { countServer, onlineServer, offlineServer } from '@/api/table'
+import { countServer } from '@/api/table'
 
 export default {
   name: 'Dashboard',
   data() {
     return {
-      total: 0,
-      online: 0,
-      offline: 0
+      data: {
+        total: 0,
+        online: 0,
+        offline: 0
+      }
     }
   },
-  created() {
-    setInterval(this.fetchCountServer, 10000)
-    this.fetchCountServer()
+  mounted() {
+    this.initWebSocket()
+    // this.conn = new WebSocket('ws://localhost:8080/api/v1/server/update')
+    // this.conn.onmessage = (e) => {
+    //   this.data = { ...this.data, ...JSON.parse(e.data) }
+    // }
+  },
+  beforeDestroy() {
+    // this.socket.disconnect()
+    if (this.conn && this.conn.readyState === WebSocket.OPEN) {
+      console.log('WebSocket 连接关闭成功')
+      this.conn.close()
+    }
   },
   methods: {
     fetchCountServer() {
       countServer().then(response => {
-        this.total = response.data
+        this.data = response.data
       })
-      onlineServer().then(response => {
-        this.online = response.data
-      })
-      offlineServer().then(response => {
-        this.offline = response.data
-      })
+    },
+    initWebSocket() {
+      this.conn = new WebSocket('ws://localhost:8080/api/v1/server/update')
+      this.conn.onopen = () => {
+        console.log('WebSocket 连接建立成功')
+        this.reconnectAttempts = 0
+      }
+      this.conn.onmessage = (e) => {
+        try {
+          this.data = { ...this.data, ...JSON.parse(e.data) }
+        } catch (error) {
+          console.error('消息解析失败: ', error)
+        }
+      }
     }
   }
 }

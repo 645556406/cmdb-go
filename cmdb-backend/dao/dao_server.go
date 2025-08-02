@@ -6,6 +6,12 @@ import (
 	"log"
 )
 
+type ServerStatusNum struct {
+	Total   int `json:"total"`
+	Online  int `json:"online"`
+	Offline int `json:"offline"`
+}
+
 func GetServerList() []model.Server {
 	db := NewDB()
 	// 获取通用数据库对象 sql.DB，然后使用其提供的功能
@@ -189,7 +195,7 @@ func GetServerOneByIP(ip string) (model.Server, error) {
 	}
 }
 
-func GetServerCount() (int, error) {
+func GetServerCount() (ServerStatusNum, error) {
 	db := NewDB()
 	sqlDB, errDb := db.DB()
 	if errDb != nil {
@@ -203,8 +209,14 @@ func GetServerCount() (int, error) {
 		}
 	}(sqlDB)
 	var servers []model.Server
+	var serverStatusNum ServerStatusNum
 	result := db.Find(&servers).RowsAffected
-	return int(result), nil
+	resultOnline := db.Where("status=?", 1).Find(&servers).RowsAffected
+	resultOffline := db.Where("status=?", 0).Find(&servers).RowsAffected
+	serverStatusNum.Total = int(result)
+	serverStatusNum.Online = int(resultOnline)
+	serverStatusNum.Offline = int(resultOffline)
+	return serverStatusNum, nil
 }
 
 func GetOnlineCountServer() (int, error) {

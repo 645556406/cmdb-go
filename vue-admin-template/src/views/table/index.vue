@@ -52,19 +52,18 @@
       <el-table
         v-loading="listLoading"
         :data="list"
-        :height="auto"
         element-loading-text="Loading"
         border
         fit
         highlight-current-row
-        style="width: 100%;margin-top:30px; gap: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);align-items: center;"
+        style="width: 100%;margin-top:20px; gap: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);align-items: center;"
       >
-        <el-table-column align="center" label="ID" fixed="left">
+        <el-table-column align="center" label="ID" fixed="left" width="80px">
           <template slot-scope="scope">
             {{ scope.row.ID }}
           </template>
         </el-table-column>
-        <el-table-column label="HostName" align="center" min-width="120">
+        <el-table-column label="HostName" align="center" min-width="150px">
           <template slot-scope="scope">
             {{ scope.row.Hostname }}
           </template>
@@ -104,12 +103,12 @@
             {{ scope.row.Area }}
           </template>
         </el-table-column>
-        <el-table-column label="Username" align="center">
+        <el-table-column label="Username" align="center" min-width="150px">
           <template slot-scope="scope">
             {{ scope.row.Username }}
           </template>
         </el-table-column>
-        <el-table-column label="Password" align="center">
+        <el-table-column label="Password" align="center" min-width="150px">
           <template slot-scope="scope">
             {{ scope.row.Password }}
           </template>
@@ -350,7 +349,7 @@ export default {
       }
       this.$confirm('确定要提交表单吗？')
         .then(_ => {
-          this.loading = true
+          // this.loading = true
           // 提交前明确转换数据类型
           const payload = {
             ID: Number(this.row.ID),

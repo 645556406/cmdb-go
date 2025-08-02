@@ -3,6 +3,7 @@ package service
 import (
 	"cmdb-backend/dao"
 	"cmdb-backend/model"
+	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"os/exec"
@@ -269,5 +270,28 @@ func StartServerStatusCheck(interval time.Duration) {
 				//wg.Wait()
 			}
 		}
+	}
+}
+
+// HandleWebSocket 处理 WebSocket 连接
+func HandleWebSocket(c *gin.Context) {
+	log.Println("HandleWebSocket")
+	conn, _ := upgrader.Upgrade(c.Writer, c.Request, nil)
+	defer func(conn *websocket.Conn) {
+		err := conn.Close()
+		if err != nil {
+			log.Println(err.Error())
+		}
+	}(conn)
+
+	for {
+		// 主动推送数据（替代 setInterval 轮询）
+		data, _ := dao.GetServerCount()
+		// 发送响应数据
+		err := conn.WriteJSON(data)
+		if err != nil {
+			return
+		}
+		time.Sleep(1 * time.Second) // 控制推送频率
 	}
 }
