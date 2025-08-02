@@ -17,7 +17,7 @@ func GetServerList() []model.Server {
 	defer func(sqlDB *sql.DB) {
 		err := sqlDB.Close()
 		if err != nil {
-
+			log.Println(err)
 		}
 	}(sqlDB)
 	var serverList []model.Server
