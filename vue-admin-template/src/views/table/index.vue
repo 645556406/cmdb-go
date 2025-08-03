@@ -9,7 +9,7 @@
     </div>
     <div>
       <!-- 对话框表单 -->
-      <el-dialog title="填写服务器信息" :visible.sync="dialogVisible" width="auto;">
+      <el-dialog title="填写服务器信息" :visible.sync="dialogVisible" width="600px">
         <el-form :model="form" label-width="auto">
           <el-form-item label="IP">
             <el-input v-model="form.IP" />
@@ -395,14 +395,6 @@ export default {
         this.listLoading = false
       })
     },
-    // fetchData() {
-    //   this.listLoading = true
-    //   getList().then(response => {
-    //     console.log(response)
-    //     this.list = response.data
-    //     this.listLoading = false
-    //   })
-    // },
     confirmRole(row) {
       this.$confirm('此操作将永久删除该服务器, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -445,4 +437,5 @@ export default {
     margin-bottom: 30px;
   }
 }
+
 </style>
