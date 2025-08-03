@@ -224,6 +224,7 @@
 
 <script>
 import { getList, updateServer, delServer, addServer, getOneByID } from '@/api/table'
+import {auto} from "html-webpack-plugin/lib/chunksorter";
 
 export default {
   filters: {
@@ -265,6 +266,7 @@ export default {
     this.fetchData()
   },
   methods: {
+    auto,
     truncateText(text) {
       return text.length > 15 ? text.slice(0, 15) + '...' : text
     },
