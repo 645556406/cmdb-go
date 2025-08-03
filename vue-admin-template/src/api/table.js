@@ -68,3 +68,20 @@ export function wsSSHConnect(host, username, password) {
     }
   }
 }
+
+export function wsUpdateSocket() {
+  return function initWebSocket() {
+    this.conn = new WebSocket(process.env.VUE_APP_WS_API + '/api/v1/server/update')
+    this.conn.onopen = () => {
+      console.log('WebSocket 连接建立成功')
+      this.reconnectAttempts = 0
+    }
+    this.conn.onmessage = (e) => {
+      try {
+        this.data = { ...this.data, ...JSON.parse(e.data) }
+      } catch (error) {
+        console.error('消息解析失败: ', error)
+      }
+    }
+  }
+}

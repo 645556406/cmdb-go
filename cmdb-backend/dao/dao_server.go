@@ -50,6 +50,10 @@ func UpdateServer(server model.Server) error {
 	}(sqlDB)
 	serverUpdate := model.Server{}
 	serverFields := make([]string, 0)
+	if server.ID >= 0 {
+		serverUpdate.ID = server.ID
+		serverFields = append(serverFields, "id")
+	}
 	if server.Hostname != "" {
 		serverUpdate.Hostname = server.Hostname
 		serverFields = append(serverFields, "HostName")

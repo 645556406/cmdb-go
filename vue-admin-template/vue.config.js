@@ -34,8 +34,8 @@ module.exports = {
       // 简单配置示例：将所有 /api 开头的请求代理到目标地址
       '/api': {
         target: 'http://127.0.0.1:8080', // 后端服务器地址
-        changeOrigin: true, // 修改请求头中的 Host 为目标地址
-        rewrite: (path) => path.replace(/^\/api/, '') // 路径重写
+        changeOrigin: true // 修改请求头中的 Host 为目标地址
+        // rewrite: (path) => path.replace(/^\/api/, '') // 路径重写
         // pathRewrite: {
         //   '^/api': '' // 移除请求路径中的 /api 前缀（可选）
         // }

@@ -38,10 +38,6 @@ export default {
   },
   mounted() {
     this.initWebSocket()
-    // this.conn = new WebSocket('ws://localhost:8080/api/v1/server/update')
-    // this.conn.onmessage = (e) => {
-    //   this.data = { ...this.data, ...JSON.parse(e.data) }
-    // }
   },
   beforeDestroy() {
     // this.socket.disconnect()
