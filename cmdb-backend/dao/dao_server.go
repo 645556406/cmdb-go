@@ -102,7 +102,7 @@ func UpdateServer(server model.Server) error {
 		serverUpdate.Port = server.Port
 		serverFields = append(serverFields, "Port")
 	}
-	err := db.Model(&model.Server{}).Where("id = ?", server.ID).Select(serverFields).Updates(serverUpdate).Error
+	err := db.Model(&server).Where("id = ?", server.ID).Updates(server).Error
 	if err != nil {
 		log.Println(err)
 	}
