@@ -9,37 +9,37 @@
     </div>
     <div>
       <!-- 对话框表单 -->
-      <el-dialog title="填写服务器信息" :visible.sync="dialogVisible" width="600px">
+      <el-dialog title="填写服务器信息" :visible.sync="dialogVisible" width="600px" top="0" center class="vertical-center-dialog">
         <el-form :model="form" label-width="auto">
           <el-form-item label="IP">
-            <el-input v-model="form.IP" />
+            <el-input v-model.trim="form.IP" />
           </el-form-item>
           <el-form-item label="HostName">
-            <el-input v-model="form.HostName" />
+            <el-input v-model.trim="form.HostName" />
           </el-form-item>
           <el-form-item label="Env">
-            <el-input v-model="form.Env" />
+            <el-input v-model.trim="form.Env" />
           </el-form-item>
           <el-form-item label="Owner">
-            <el-input v-model="form.Owner" />
+            <el-input v-model.trim="form.Owner" />
           </el-form-item>
           <el-form-item label="OS">
-            <el-input v-model="form.OS" />
+            <el-input v-model.trim="form.OS" />
           </el-form-item>
           <el-form-item label="Area">
-            <el-input v-model="form.Area" />
+            <el-input v-model.trim="form.Area" />
           </el-form-item>
           <el-form-item label="Username">
-            <el-input v-model="form.Username" />
+            <el-input v-model.trim="form.Username" />
           </el-form-item>
           <el-form-item label="Password">
-            <el-input v-model="form.Password" type="password" />
+            <el-input v-model.trim="form.Password" type="password" />
           </el-form-item>
           <el-form-item label="Port">
-            <el-input v-model="form.Port" type="password" />
+            <el-input v-model.number="form.Port" />
           </el-form-item>
           <el-form-item label="PublicKey">
-            <el-input v-model="form.PublicKey" />
+            <el-input v-model.trim="form.PublicKey" />
           </el-form-item>
         </el-form>
         <span slot="footer">
@@ -58,17 +58,17 @@
         highlight-current-row
         style="width: 100%;margin-top:20px; gap: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);align-items: center;"
       >
-        <el-table-column align="center" label="ID" fixed="left" width="80px">
+        <el-table-column align="center" label="ID" fixed="left">
           <template slot-scope="scope">
             {{ scope.row.ID }}
           </template>
         </el-table-column>
-        <el-table-column label="HostName" align="center" min-width="150px">
+        <el-table-column label="HostName" align="center">
           <template slot-scope="scope">
             {{ scope.row.Hostname }}
           </template>
         </el-table-column>
-        <el-table-column label="IP" align="center" min-width="150">
+        <el-table-column label="IP" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.IP }}</span>
           </template>
@@ -78,7 +78,7 @@
             {{ scope.row.Env }}
           </template>
         </el-table-column>
-        <el-table-column class-name="status-col" label="OS" align="center" width="100">
+        <el-table-column class-name="status-col" label="OS" align="center">
           <template slot-scope="scope">
             <el-tag :type="scope.row.status | statusFilter">{{ scope.row.OS }}</el-tag>
           </template>
@@ -93,11 +93,11 @@
             {{ scope.row.Memory }}
           </template>
         </el-table-column>
-        <el-table-column label="Owner" align="center">
-          <template slot-scope="scope">
-            {{ scope.row.Owner }}
-          </template>
-        </el-table-column>
+        <!--        <el-table-column label="Owner" align="center">-->
+        <!--          <template slot-scope="scope">-->
+        <!--            {{ scope.row.Owner }}-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
         <el-table-column label="Area" align="center">
           <template slot-scope="scope">
             {{ scope.row.Area }}
@@ -108,38 +108,38 @@
             {{ scope.row.Username }}
           </template>
         </el-table-column>
-        <el-table-column label="Password" align="center" min-width="150px">
-          <template slot-scope="scope">
-            {{ scope.row.Password }}
-          </template>
-        </el-table-column>
+        <!--        <el-table-column label="Password" align="center" min-width="150px">-->
+        <!--          <template slot-scope="scope">-->
+        <!--            {{ scope.row.Password }}-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
         <el-table-column label="Port" align="center">
           <template slot-scope="scope">
             {{ scope.row.Port }}
           </template>
         </el-table-column>
-        <el-table-column label="PublicKey" align="center" width="200">
-          <template slot-scope="scope">
-            {{ truncateText(scope.row.PublicKey) }}
-          </template>
-        </el-table-column>
+        <!--        <el-table-column label="PublicKey" align="center" width="200">-->
+        <!--          <template slot-scope="scope">-->
+        <!--            {{ truncateText(scope.row.PublicKey) }}-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
         <el-table-column label="Status" align="center">
           <template slot-scope="scope">
             {{ scope.row.Status }}
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="created_at" label="CreateTime" width="250">
-          <template slot-scope="scope">
-            <i class="el-icon-time" />
-            <span>{{ scope.row.CreatedAt }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" prop="updated_at" label="UpdateTime" width="250">
-          <template slot-scope="scope">
-            <i class="el-icon-time" />
-            <span>{{ scope.row.UpdatedAt }}</span>
-          </template>
-        </el-table-column>
+        <!--        <el-table-column align="center" prop="created_at" label="CreateTime" width="250">-->
+        <!--          <template slot-scope="scope">-->
+        <!--            <i class="el-icon-time" />-->
+        <!--            <span>{{ scope.row.CreatedAt }}</span>-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
+        <!--        <el-table-column align="center" prop="updated_at" label="UpdateTime" width="250">-->
+        <!--          <template slot-scope="scope">-->
+        <!--            <i class="el-icon-time" />-->
+        <!--            <span>{{ scope.row.UpdatedAt }}</span>-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
         <el-table-column align="center" label="Actions" width="250" fixed="right" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" @click="openTerminalSafe(scope.row)">安全连接</el-button>
@@ -437,5 +437,10 @@ export default {
     margin-bottom: 30px;
   }
 }
-
+.vertical-center-dialog .el-dialog {
+  margin-top: 0 !important; /* 移除默认的 margin-top */
+  transform: translateY(-20%); /* 向上移动50% */
+  top: 20%; /* 设置顶部距离为50% */
+  position: absolute; /* 使用绝对定位 */
+}
 </style>

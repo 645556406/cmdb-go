@@ -59,15 +59,15 @@ func Ping(c *gin.Context) {
 func AddServer(context *gin.Context) {
 	var server model.Server
 	if err := context.ShouldBindJSON(&server); err != nil {
+		log.Println(err.Error())
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	err := dao.AddServer(server)
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
 	} else {
-		context.JSON(http.StatusOK, Response{Code: 20000, Message: "success"})
+		err := dao.AddServer(server)
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		} else {
+			context.JSON(http.StatusOK, Response{Code: 20000, Message: "success"})
+		}
 	}
 }
 

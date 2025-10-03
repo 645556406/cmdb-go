@@ -1,6 +1,6 @@
 DB:
-  hostname: 127.0.0.1
-  port: 3306
+  hostname: 192.168.254.132
+  port: 23306
   username: root
   password: sls123
   database: cmdb

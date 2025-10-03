@@ -192,8 +192,6 @@ func HandleWebSSHSinger(c *gin.Context) {
 		}
 	}
 }
-
-// 解密加密的私钥
 func decryptPrivateKey(keyBytes []byte, passphrase string) (ssh.Signer, error) {
 	return ssh.ParsePrivateKeyWithPassphrase(keyBytes, []byte(passphrase))
 }
