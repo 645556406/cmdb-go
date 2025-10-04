@@ -2,7 +2,7 @@ package dao
 
 import (
 	"cmdb-backend/model"
-	"database/sql"
+	"fmt"
 	"log"
 )
 
@@ -13,21 +13,9 @@ type ServerStatusNum struct {
 }
 
 func GetServerList() []model.Server {
-	db := NewDB()
-	// 获取通用数据库对象 sql.DB，然后使用其提供的功能
-	sqlDB, errDb := db.DB()
-	if errDb != nil {
-		log.Println(errDb)
-	}
-	// Close
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
 
-		}
-	}(sqlDB)
 	var serverList []model.Server
-	err := db.Where("deleted_at IS NULL").Find(&serverList).Error
+	err := DB.Where("deleted_at IS NULL").Find(&serverList).Error
 	if err != nil {
 		log.Println(err)
 	}
@@ -35,95 +23,65 @@ func GetServerList() []model.Server {
 }
 
 func UpdateServer(server model.Server) error {
-	db := NewDB()
-	// 获取通用数据库对象 sql.DB，然后使用其提供的功能
-	sqlDB, errDb := db.DB()
-	if errDb != nil {
-		log.Println(errDb)
-	}
-	// Close
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
+	// 使用 map 的简洁写法（推荐）
+	updates := make(map[string]interface{})
 
-		}
-	}(sqlDB)
-	serverUpdate := model.Server{}
-	serverFields := make([]string, 0)
-	if server.ID >= 0 {
-		serverUpdate.ID = server.ID
-		serverFields = append(serverFields, "id")
-	}
+	// 一行一个字段，清晰简洁
 	if server.Hostname != "" {
-		serverUpdate.Hostname = server.Hostname
-		serverFields = append(serverFields, "HostName")
+		updates["hostname"] = server.Hostname
 	}
 	if server.CPU > 0 {
-		serverUpdate.CPU = server.CPU
-		serverFields = append(serverFields, "CPU")
+		updates["cpu"] = server.CPU
 	}
 	if server.Memory > 0 {
-		serverUpdate.Memory = server.Memory
-		serverFields = append(serverFields, "Memory")
+		updates["memory"] = server.Memory
 	}
 	if server.IP != "" {
-		serverUpdate.IP = server.IP
-		serverFields = append(serverFields, "IP")
+		updates["ip"] = server.IP
 	}
-	if server.IP != "" {
-		serverUpdate.Username = server.Username
-		serverFields = append(serverFields, "Username")
+	if server.Username != "" {
+		updates["username"] = server.Username
 	}
-	if server.IP != "" {
-		serverUpdate.Password = server.Password
-		serverFields = append(serverFields, "Password")
+	if server.Password != "" {
+		updates["password"] = server.Password
 	}
-	if server.IP != "" {
-		serverUpdate.Area = server.Area
-		serverFields = append(serverFields, "Area")
+	if server.Area != "" {
+		updates["area"] = server.Area
 	}
-	if server.IP != "" {
-		serverUpdate.PublicKey = server.PublicKey
-		serverFields = append(serverFields, "PublicKey")
+	if server.PublicKey != "" {
+		updates["public_key"] = server.PublicKey
 	}
 	if server.Env != "" {
-		serverUpdate.Env = server.Env
-		serverFields = append(serverFields, "Env")
+		updates["env"] = server.Env
 	}
 	if server.OS != "" {
-		serverUpdate.OS = server.OS
-		serverFields = append(serverFields, "OS")
+		updates["os"] = server.OS
 	}
 	if server.Owner != "" {
-		serverUpdate.Owner = server.Owner
-		serverFields = append(serverFields, "Owner")
+		updates["owner"] = server.Owner
 	}
 	if server.Port > 0 {
-		serverUpdate.Port = server.Port
-		serverFields = append(serverFields, "Port")
+		updates["port"] = server.Port
 	}
-	err := db.Model(&server).Where("id = ?", server.ID).Updates(server).Error
-	if err != nil {
-		log.Println(err)
+
+	if len(updates) == 0 {
+		return fmt.Errorf("no fields to update")
 	}
-	return err
+
+	result := DB.Model(&model.Server{}).Where("id = ?", server.ID).Updates(updates)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("server not found")
+	}
+
+	return nil
 }
 
 func AddServer(server model.Server) error {
-	db := NewDB()
-	// 获取通用数据库对象 sql.DB，然后使用其提供的功能
-	sqlDB, errDb := db.DB()
-	if errDb != nil {
-		log.Println(errDb)
-	}
-	// Close
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-
-		}
-	}(sqlDB)
-	err := db.Create(&server).Error
+	err := DB.Create(&server).Error
 	if err != nil {
 		log.Println(err)
 	}
@@ -131,20 +89,7 @@ func AddServer(server model.Server) error {
 }
 
 func DelServer(server model.Server) error {
-	db := NewDB()
-	// 获取通用数据库对象 sql.DB，然后使用其提供的功能
-	sqlDB, errDb := db.DB()
-	if errDb != nil {
-		log.Println(errDb)
-	}
-	// Close
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-
-		}
-	}(sqlDB)
-	err := db.Delete(&server).Error
+	err := DB.Delete(&server).Error
 	if err != nil {
 		log.Println(err)
 	}
@@ -152,21 +97,8 @@ func DelServer(server model.Server) error {
 }
 
 func GetServerDetailByID(id uint64) (model.Server, error) {
-	db := NewDB()
-	// 获取通用数据库对象 sql.DB，然后使用其提供的功能
-	sqlDB, errDb := db.DB()
-	if errDb != nil {
-		log.Println(errDb)
-	}
-	// Close
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-
-		}
-	}(sqlDB)
 	var server model.Server
-	err := db.First(&server, id).Error
+	err := DB.First(&server, id).Error
 	if err != nil {
 		log.Println(err)
 		return server, err
@@ -176,21 +108,9 @@ func GetServerDetailByID(id uint64) (model.Server, error) {
 }
 
 func GetServerOneByIP(ip string) (model.Server, error) {
-	db := NewDB()
-	// 获取通用数据库对象 sql.DB，然后使用其提供的功能
-	sqlDB, errDb := db.DB()
-	if errDb != nil {
-		log.Println(errDb)
-	}
-	// Close
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
 
-		}
-	}(sqlDB)
 	var server model.Server
-	err := db.Where("IP = ?", ip).First(&server).Error
+	err := DB.Where("IP = ?", ip).First(&server).Error
 	if err != nil {
 		log.Println(err)
 		return server, err
@@ -200,23 +120,11 @@ func GetServerOneByIP(ip string) (model.Server, error) {
 }
 
 func GetServerCount() (ServerStatusNum, error) {
-	db := NewDB()
-	sqlDB, errDb := db.DB()
-	if errDb != nil {
-		log.Println(errDb)
-	}
-	// Close
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-
-		}
-	}(sqlDB)
 	var servers []model.Server
 	var serverStatusNum ServerStatusNum
-	result := db.Find(&servers).RowsAffected
-	resultOnline := db.Where("status=?", 1).Find(&servers).RowsAffected
-	resultOffline := db.Where("status=?", 0).Find(&servers).RowsAffected
+	result := DB.Find(&servers).RowsAffected
+	resultOnline := DB.Where("status=?", 1).Find(&servers).RowsAffected
+	resultOffline := DB.Where("status=?", 0).Find(&servers).RowsAffected
 	serverStatusNum.Total = int(result)
 	serverStatusNum.Online = int(resultOnline)
 	serverStatusNum.Offline = int(resultOffline)
@@ -224,75 +132,27 @@ func GetServerCount() (ServerStatusNum, error) {
 }
 
 func GetOnlineCountServer() (int, error) {
-	db := NewDB()
-	sqlDB, errDb := db.DB()
-	if errDb != nil {
-		log.Println(errDb)
-	}
-	// Close
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-
-		}
-	}(sqlDB)
 	var servers []model.Server
-	result := db.Where("status=?", 1).Find(&servers).RowsAffected
+	result := DB.Where("status=?", 1).Find(&servers).RowsAffected
 	return int(result), nil
 }
 
 func GetOfflineCountServer() (int, error) {
-	db := NewDB()
-	sqlDB, errDb := db.DB()
-	if errDb != nil {
-		log.Println(errDb)
-	}
-	// Close
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-
-		}
-	}(sqlDB)
 	var servers []model.Server
-	result := db.Where("status=?", 0).Find(&servers).RowsAffected
+	result := DB.Where("status=?", 0).Find(&servers).RowsAffected
 	return int(result), nil
 }
 
 func GetServerIPList() ([]model.Server, error) {
-	db := NewDB()
-	sqlDB, errDb := db.DB()
-	if errDb != nil {
-		log.Println(errDb)
-	}
-	// Close
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(sqlDB)
 	var servers []model.Server
-	db.Select("ID", "IP").Find(&servers)
+	DB.Select("ID", "IP").Find(&servers)
 	return servers, nil
 }
 
 func UpdateServerStatus(id uint, s int) {
-	db := NewDB()
-	sqlDB, errDb := db.DB()
-	if errDb != nil {
-		log.Println(errDb)
-	}
-	// Close
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(sqlDB)
 	var servers model.Server
 	servers.Status = s
-	err := db.Model(&model.Server{}).Where("id = ?", id).Select("Status").Updates(servers).Error
+	err := DB.Model(&model.Server{}).Where("id = ?", id).Select("Status").Updates(servers).Error
 	if err != nil {
 		log.Println(err)
 	}
