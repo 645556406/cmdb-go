@@ -1,12 +1,12 @@
 package route
 
 import (
-	"cmdb-backend/api"
 	"cmdb-backend/service"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
-var R = api.NewRouter()
+var R = gin.New()
 
 func InitRouter() {
 	R.Use(cors.Default())
