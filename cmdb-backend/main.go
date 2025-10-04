@@ -9,7 +9,7 @@ import (
 func main() {
 	// 初始化路由
 	route.InitRouter()
-	// 程序关闭时，关闭数据库
+	// 关闭数据库连接
 	defer func() {
 		if err := dao.CloseDB(); err != nil {
 			log.Printf("Warning: error closing database: %v", err)
