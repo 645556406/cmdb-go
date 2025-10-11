@@ -63,7 +63,7 @@ func HandleWebSSHSinger(c *gin.Context) {
 		log.Println("私钥路径为空")
 		return
 	}
-	log.Println("私钥路径:", privateKeyPath)
+
 	// 3. 读取并解析私钥文件
 	privateKeyBytes, errReadFile := os.ReadFile(privateKeyPath)
 	if errReadFile != nil {
@@ -83,6 +83,7 @@ func HandleWebSSHSinger(c *gin.Context) {
 			}
 		}
 	}
+
 	// 获取主机公钥
 	host := params.Host
 	log.Println("主机:", host)

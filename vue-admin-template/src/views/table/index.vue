@@ -58,7 +58,7 @@
         highlight-current-row
         style="width: 100%;margin-top:20px; gap: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);align-items: center;"
       >
-        <el-table-column align="center" label="ID" fixed="left">
+        <el-table-column align="center" label="ID" fixed="left" min-width="40">
           <template slot-scope="scope">
             {{ scope.row.ID }}
           </template>
@@ -83,7 +83,7 @@
             <el-tag :type="scope.row.status | statusFilter">{{ scope.row.OS }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="CPU" align="center">
+        <el-table-column label="CPU" align="center" min-width="40">
           <template slot-scope="scope">
             {{ scope.row.CPU }}
           </template>
