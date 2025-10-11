@@ -6,15 +6,11 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
-	"os/exec"
 	"regexp"
-	"runtime"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-ping/ping"
 )
 
 type Response struct {
@@ -181,97 +177,97 @@ func GetCountServer(context *gin.Context) {
 }
 
 // GetOnlineCountServer 函数用于获取在线服务器的数量
-func GetOnlineCountServer(context *gin.Context) {
-	count, err := dao.GetOnlineCountServer()
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	} else {
-		context.JSON(http.StatusOK, Response{Code: 20000, Message: "success", Data: count})
-	}
-}
+//func GetOnlineCountServer(context *gin.Context) {
+//	count, err := dao.GetOnlineCountServer()
+//	if err != nil {
+//		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+//		return
+//	} else {
+//		context.JSON(http.StatusOK, Response{Code: 20000, Message: "success", Data: count})
+//	}
+//}
 
 // GetOfflineCountServer 函数用于获取离线服务器的数量
-func GetOfflineCountServer(context *gin.Context) {
-	count, err := dao.GetOfflineCountServer()
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	} else {
-		context.JSON(http.StatusOK, Response{Code: 20000, Message: "success", Data: count})
-	}
-}
+//func GetOfflineCountServer(context *gin.Context) {
+//	count, err := dao.GetOfflineCountServer()
+//	if err != nil {
+//		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+//		return
+//	} else {
+//		context.JSON(http.StatusOK, Response{Code: 20000, Message: "success", Data: count})
+//	}
+//}
 
-func GetServerIPList() ([]model.Server, error) {
-	serverList, err := dao.GetServerIPList()
-	return serverList, err
-}
+//func GetServerIPList() ([]model.Server, error) {
+//	serverList, err := dao.GetServerIPList()
+//	return serverList, err
+//}
 
-func CheckServerStatus(ip string) bool {
-	pingEr, err := ping.NewPinger(ip)
-	if err != nil {
-		return false
-	}
-	pingEr.SetPrivileged(true)
-	pingEr.Count = 2
-	pingEr.Timeout = 2 * time.Second
-	err = pingEr.Run()
-	if err != nil {
-		log.Println(err.Error())
-		return false
-	}
-	stats := pingEr.Statistics()
-	return stats.PacketsRecv > 0
-}
+//func CheckServerStatus(ip string) bool {
+//	pingEr, err := ping.NewPinger(ip)
+//	if err != nil {
+//		return false
+//	}
+//	pingEr.SetPrivileged(true)
+//	pingEr.Count = 2
+//	pingEr.Timeout = 2 * time.Second
+//	err = pingEr.Run()
+//	if err != nil {
+//		log.Println(err.Error())
+//		return false
+//	}
+//	stats := pingEr.Statistics()
+//	return stats.PacketsRecv > 0
+//}
 
-func MacPing(ip string) bool {
-	cmd := exec.Command("ping", "-c", "1", "-W", "1", ip)
-	if err := cmd.Run(); err != nil {
-		return false
-	}
-	return true
-}
+//func MacPing(ip string) bool {
+//	cmd := exec.Command("ping", "-c", "1", "-W", "1", ip)
+//	if err := cmd.Run(); err != nil {
+//		return false
+//	}
+//	return true
+//}
 
 // UpdateServerStatus 函数用于更新服务器的状态。
-func UpdateServerStatus(server model.Server) {
-	var result bool
-	switch runtime.GOOS {
-	case "darwin":
-
-		result = MacPing(server.IP)
-	default:
-		result = CheckServerStatus(server.IP)
-	}
-	if result {
-		//log.Println("Ping success:", server.IP)
-		dao.UpdateServerStatus(server.ID, 1)
-		//GetLinuxConfig(server)
-	} else {
-		dao.UpdateServerStatus(server.ID, 0)
-	}
-}
+//func UpdateServerStatus(server model.Server) {
+//	var result bool
+//	switch runtime.GOOS {
+//	case "darwin":
+//
+//		result = MacPing(server.IP)
+//	default:
+//		result = CheckServerStatus(server.IP)
+//	}
+//	if result {
+//		//log.Println("Ping success:", server.IP)
+//		dao.UpdateServerStatus(server.ID, 1)
+//		//GetLinuxConfig(server)
+//	} else {
+//		dao.UpdateServerStatus(server.ID, 0)
+//	}
+//}
 
 // StartServerStatusCheck 函数用于启动服务器状态检查任务。
 //
 // 参数:
 //
 //	interval - 检查间隔时间，单位为秒。
-func StartServerStatusCheck(interval time.Duration) {
-	ticker := time.NewTicker(interval)
-	defer ticker.Stop()
-	var wg sync.WaitGroup
-	for {
-		select {
-		case <-ticker.C:
-			serverList := dao.GetServerList()
-			for _, server := range serverList {
-				wg.Add(1)
-				go UpdateServerStatus(server)
-				//wg.Wait()
-			}
-		}
-	}
-}
+//func StartServerStatusCheck(interval time.Duration) {
+//	ticker := time.NewTicker(interval)
+//	defer ticker.Stop()
+//	var wg sync.WaitGroup
+//	for {
+//		select {
+//		case <-ticker.C:
+//			serverList := dao.GetServerList()
+//			for _, server := range serverList {
+//				wg.Add(1)
+//				go UpdateServerStatus(server)
+//				//wg.Wait()
+//			}
+//		}
+//	}
+//}
 
 // HandleWebSocket 处理 WebSocket 连接
 func HandleWebSocket(c *gin.Context) {

@@ -39,18 +39,18 @@ type YamlConfig struct {
 	error - 错误信息，如果读取和解析配置文件过程中发生错误，则返回非nil的error
 
 */
-func LoadYamlConfig(path string) (*YamlConfig, error) {
-	var config YamlConfig
-	file, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	errYaml := yaml.Unmarshal(file, &config)
-	if errYaml != nil {
-		return nil, errYaml
-	}
-	return &config, nil
-}
+//func LoadYamlConfig(path string) (*YamlConfig, error) {
+//	var config YamlConfig
+//	file, err := os.ReadFile(path)
+//	if err != nil {
+//		return nil, err
+//	}
+//	errYaml := yaml.Unmarshal(file, &config)
+//	if errYaml != nil {
+//		return nil, errYaml
+//	}
+//	return &config, nil
+//}
 
 // LoadYamlConfigNew
 /* 从指定路径加载YAML配置文件，并返回一个map[string]interface{}类型的配置项

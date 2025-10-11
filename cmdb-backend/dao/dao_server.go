@@ -131,30 +131,30 @@ func GetServerCount() (ServerStatusNum, error) {
 	return serverStatusNum, nil
 }
 
-func GetOnlineCountServer() (int, error) {
-	var servers []model.Server
-	result := DB.Where("status=?", 1).Find(&servers).RowsAffected
-	return int(result), nil
-}
+//func GetOnlineCountServer() (int, error) {
+//	var servers []model.Server
+//	result := DB.Where("status=?", 1).Find(&servers).RowsAffected
+//	return int(result), nil
+//}
+//
+//func GetOfflineCountServer() (int, error) {
+//	var servers []model.Server
+//	result := DB.Where("status=?", 0).Find(&servers).RowsAffected
+//	return int(result), nil
+//}
 
-func GetOfflineCountServer() (int, error) {
-	var servers []model.Server
-	result := DB.Where("status=?", 0).Find(&servers).RowsAffected
-	return int(result), nil
-}
+//func GetServerIPList() ([]model.Server, error) {
+//	var servers []model.Server
+//	DB.Select("ID", "IP").Find(&servers)
+//	return servers, nil
+//}
 
-func GetServerIPList() ([]model.Server, error) {
-	var servers []model.Server
-	DB.Select("ID", "IP").Find(&servers)
-	return servers, nil
-}
-
-func UpdateServerStatus(id uint, s int) {
-	var servers model.Server
-	servers.Status = s
-	err := DB.Model(&model.Server{}).Where("id = ?", id).Select("Status").Updates(servers).Error
-	if err != nil {
-		log.Println(err)
-	}
-	return
-}
+//func UpdateServerStatus(id uint, s int) {
+//	var servers model.Server
+//	servers.Status = s
+//	err := DB.Model(&model.Server{}).Where("id = ?", id).Select("Status").Updates(servers).Error
+//	if err != nil {
+//		log.Println(err)
+//	}
+//	return
+//}

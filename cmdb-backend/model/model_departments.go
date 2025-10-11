@@ -2,7 +2,7 @@ package model
 
 import "gorm.io/gorm"
 
-// 部门表
+// Departments 部门表
 type Departments struct {
 	gorm.Model
 	Name        string `gorm:"column:name"`         // 部门名称
