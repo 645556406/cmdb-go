@@ -29,6 +29,7 @@ type Response struct {
 //
 //	无
 func GetServerList(c *gin.Context) {
+
 	serverList := dao.GetServerList()
 	var response Response
 	response.Code = 20000
@@ -55,16 +56,28 @@ func Ping(c *gin.Context) {
 func AddServer(context *gin.Context) {
 	var server model.Server
 	if err := context.ShouldBindJSON(&server); err != nil {
-		log.Println(err.Error())
-		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		err := dao.AddServer(server)
-		if err != nil {
-			context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		} else {
-			context.JSON(http.StatusOK, Response{Code: 20000, Message: "success"})
-		}
+		log.Printf("添加服务器参数解析失败: %v", err)
+		context.JSON(http.StatusBadRequest, Response{Code: 40000, Message: "参数格式错误: " + err.Error()})
+		return
 	}
+	
+	// 验证必要字段
+	if server.Hostname == "" {
+		context.JSON(http.StatusBadRequest, Response{Code: 40000, Message: "主机名不能为空"})
+		return
+	}
+	if server.IP == "" {
+		context.JSON(http.StatusBadRequest, Response{Code: 40000, Message: "IP地址不能为空"})
+		return
+	}
+	
+	err := dao.AddServer(server)
+	if err != nil {
+		log.Printf("添加服务器失败: %v", err)
+		context.JSON(http.StatusInternalServerError, Response{Code: 50000, Message: "添加服务器失败: " + err.Error()})
+		return
+	} 
+	context.JSON(http.StatusOK, Response{Code: 20000, Message: "success"})
 }
 
 // DelServer 用于删除服务器信息
@@ -79,16 +92,23 @@ func AddServer(context *gin.Context) {
 func DelServer(context *gin.Context) {
 	var server model.Server
 	if err := context.ShouldBindJSON(&server); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		log.Printf("删除服务器参数解析失败: %v", err)
+		context.JSON(http.StatusBadRequest, Response{Code: 40000, Message: "参数格式错误: " + err.Error()})
 		return
 	}
+	
+	if server.ID == 0 {
+		context.JSON(http.StatusBadRequest, Response{Code: 40000, Message: "服务器ID不能为空"})
+		return
+	}
+	
 	err := dao.DelServer(server)
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Printf("删除服务器失败: %v", err)
+		context.JSON(http.StatusInternalServerError, Response{Code: 50000, Message: "删除服务器失败: " + err.Error()})
 		return
-	} else {
-		context.JSON(http.StatusOK, Response{Code: 20000, Message: "success"})
-	}
+	} 
+	context.JSON(http.StatusOK, Response{Code: 20000, Message: "success"})
 }
 
 // UpdateServer 用于更新服务器信息

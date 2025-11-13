@@ -2,6 +2,7 @@ package route
 
 import (
 	"cmdb-backend/service"
+	"log"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -29,6 +30,6 @@ func InitRouter() {
 	}
 	err := R.Run(":8080")
 	if err != nil {
-		return
+		log.Fatalf("启动服务器失败: %v", err)
 	}
 }

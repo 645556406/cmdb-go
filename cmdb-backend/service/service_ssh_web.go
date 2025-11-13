@@ -16,7 +16,21 @@ import (
 )
 
 var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool { return true }, // 允许跨域（生产环境需限制）
+	CheckOrigin: func(r *http.Request) bool {
+		origin := r.Header.Get("Origin")
+		// 在生产环境中应该检查origin是否在允许列表中
+		allowedOrigins := []string{
+			"http://localhost:9528",
+			"http://127.0.0.1:9528",
+			// 添加其他允许的域名
+		}
+		for _, allowed := range allowedOrigins {
+			if origin == allowed {
+				return true
+			}
+		}
+		return false // 默认拒绝跨域请求
+	},
 }
 
 // 自定义Writer将SSH输出转发到WebSocket
@@ -67,41 +81,53 @@ func HandleWebSSHSinger(c *gin.Context) {
 	// 3. 读取并解析私钥文件
 	privateKeyBytes, errReadFile := os.ReadFile(privateKeyPath)
 	if errReadFile != nil {
+		log.Printf("读取私钥文件失败: %v", errReadFile)
+		_ = ws.WriteJSON(map[string]string{"error": "私钥文件读取失败"})
 		return
 	}
 
 	// 4. 解析私钥（支持加密的私钥）
 	signer, errSSH := ssh.ParsePrivateKey(privateKeyBytes)
 	if errSSH != nil {
+		log.Printf("解析私钥失败: %v", errSSH)
 		// 如果私钥有密码，尝试解密
 		var passphraseMissingError *ssh.PassphraseMissingError
 		if errors.As(errSSH, &passphraseMissingError) {
 			// 尝试使用密码解密私钥(如果有的话这里需要修改下ssh私钥密码，没有就可以忽略了)
 			signer, err = decryptPrivateKey(privateKeyBytes, "")
 			if err != nil {
+				log.Printf("解密私钥失败: %v", err)
+				_ = ws.WriteJSON(map[string]string{"error": "私钥解密失败"})
 				return
 			}
+		} else {
+			_ = ws.WriteJSON(map[string]string{"error": "私钥解析失败"})
+			return
 		}
 	}
 
 	// 获取主机公钥
 	host := params.Host
-	log.Println("主机:", host)
+	log.Printf("连接主机: %s", host)
 	serverInfo, err := dao.GetServerOneByIP(host)
 	if err != nil {
-		log.Println(err)
+		log.Printf("获取服务器信息失败: %v", err)
+		_ = ws.WriteJSON(map[string]string{"error": "服务器信息不存在"})
 		return
 	}
 	publicKey := serverInfo.PublicKey
 	if publicKey == "" {
 		log.Println("主机公钥为空")
+		_ = ws.WriteJSON(map[string]string{"error": "主机公钥为空"})
 		return
 	}
 	// 从文件或硬编码字符串加载公钥
 	hostKeyBytes := []byte(publicKey)
 	hostKey, _, _, _, err := ssh.ParseAuthorizedKey(hostKeyBytes)
 	if err != nil {
-		log.Fatal("解析公钥失败:", err)
+		log.Printf("解析公钥失败: %v", err)
+		_ = ws.WriteJSON(map[string]string{"error": "公钥解析失败"})
+		return
 	}
 	// 5. 配置 SSH 客户端
 	config := &ssh.ClientConfig{

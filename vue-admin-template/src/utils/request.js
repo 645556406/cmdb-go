@@ -46,7 +46,10 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
-    console.log(res)
+    // 移除生产环境的console.log
+    if (process.env.NODE_ENV === 'development') {
+      console.log(res)
+    }
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 20000) {
       Message({
@@ -58,9 +61,9 @@ service.interceptors.response.use(
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
         // to re-login
-        MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-          confirmButtonText: 'Re-Login',
-          cancelButtonText: 'Cancel',
+        MessageBox.confirm('登录状态已过期，您可以取消停留在此页面，或重新登录', '确认登出', {
+          confirmButtonText: '重新登录',
+          cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           store.dispatch('user/resetToken').then(() => {
@@ -74,9 +77,36 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('err' + error) // for debug
+    // 移除生产环境的console.log，增强错误处理
+    if (process.env.NODE_ENV === 'development') {
+      console.log('请求错误:', error)
+    }
+    
+    let errorMessage = '网络请求失败'
+    if (error.response) {
+      // 服务器返回错误状态码
+      switch (error.response.status) {
+        case 401:
+          errorMessage = '未授权，请重新登录'
+          break
+        case 403:
+          errorMessage = '拒绝访问'
+          break
+        case 404:
+          errorMessage = '请求地址不存在'
+          break
+        case 500:
+          errorMessage = '服务器内部错误'
+          break
+        default:
+          errorMessage = `请求失败: ${error.response.status}`
+      }
+    } else if (error.request) {
+      errorMessage = '网络连接失败，请检查网络设置'
+    }
+    
     Message({
-      message: error.message,
+      message: error.message || errorMessage,
       type: 'error',
       duration: 5 * 1000
     })

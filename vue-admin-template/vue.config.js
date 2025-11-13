@@ -33,26 +33,33 @@ module.exports = {
     proxy: {
       // 简单配置示例：将所有 /api 开头的请求代理到目标地址
       '/api': {
-        target: 'http://192.168.253.121:8080', // 后端服务器地址
-        changeOrigin: true // 修改请求头中的 Host 为目标地址
+        target: process.env.VUE_APP_API_BASE_URL || 'http://localhost:8080', // 从环境变量读取后端地址
+        changeOrigin: true, // 修改请求头中的 Host 为目标地址
+        secure: false, // 如果是https接口，需要配置这个参数
+        logLevel: 'debug' // 开启代理日志
         // rewrite: (path) => path.replace(/^\/api/, '') // 路径重写
         // pathRewrite: {
         //   '^/api': '' // 移除请求路径中的 /api 前缀（可选）
         // }
+      },
+      // WebSocket代理配置
+      '/socket.io': {
+        target: process.env.VUE_APP_WS_BASE_URL || 'ws://localhost:8080',
+        ws: true,
+        changeOrigin: true,
+        logLevel: 'debug'
       }
-      // '/socket': {
-      //   target: 'ws://127.0.0.1:8080', // WebSocket 服务端口
-      //   ws: true,
-      //   changeOrigin: true,
-      //   pathRewrite: { '^/socket': '' }
-      // }
     },
     port: port,
     open: true,
     overlay: {
       warnings: false,
       errors: true
-    }
+    },
+    // 添加热更新配置
+    hot: true,
+    // 添加压缩配置
+    compress: true
     // before: require('./mock/mock-server.js')
   },
   configureWebpack: {

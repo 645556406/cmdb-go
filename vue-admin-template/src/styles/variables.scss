@@ -1,13 +1,36 @@
-// sidebar
-$menuText:#bfcbd9;
-$menuActiveText:#409EFF;
-$subMenuActiveText:#f4f4f5; //https://github.com/ElemeFE/element/issues/12951
+// 温和色调主题配置 - 柔和蓝绿色系
+$menuText: #6b7280;
+$menuActiveText: #10b981;
+$subMenuActiveText: #f0fdf4; 
 
-$menuBg:#304156;
-$menuHover:#263445;
+$menuBg: #f8fafc;
+$menuHover: #ecfdf5;
 
-$subMenuBg:#1f2d3d;
-$subMenuHover:#001528;
+$subMenuBg: #f1f5f9;
+$subMenuHover: #dcfce7;
+
+// 主题色彩变量
+$primary-color: #10b981;      // 温和绿色
+$primary-light: #34d399;      // 浅绿色
+$primary-dark: #059669;       // 深绿色
+$secondary-color: #3b82f6;    // 柔和蓝色
+$accent-color: #8b5cf6;       // 淡紫色
+
+// 中性色彩
+$text-primary: #1f2937;       // 主文字色
+$text-secondary: #6b7280;     // 次要文字色
+$text-light: #9ca3af;         // 浅色文字
+$border-color: #e5e7eb;       // 边框色
+$bg-color: #ffffff;           // 背景色
+$bg-gray: #f9fafb;            // 灰色背景
+$bg-light: #f3f4f6;           // 浅灰背景
+
+// 深色主题配色
+$dark-bg: #1a1a1a;
+$dark-surface: #2d2d2d;
+$dark-border: #404040;
+$dark-text: #e5e5e5;
+$dark-text-secondary: #a0a0a0;
 
 $sideBarWidth: 210px;
 
@@ -22,4 +45,21 @@ $sideBarWidth: 210px;
   subMenuBg: $subMenuBg;
   subMenuHover: $subMenuHover;
   sideBarWidth: $sideBarWidth;
+  primaryColor: $primary-color;
+  primaryLight: $primary-light;
+  primaryDark: $primary-dark;
+  secondaryColor: $secondary-color;
+  accentColor: $accent-color;
+  textPrimary: $text-primary;
+  textSecondary: $text-secondary;
+  textLight: $text-light;
+  borderColor: $border-color;
+  bgColor: $bg-color;
+  bgGray: $bg-gray;
+  bgLight: $bg-light;
+  darkBg: $dark-bg;
+  darkSurface: $dark-surface;
+  darkBorder: $dark-border;
+  darkText: $dark-text;
+  darkTextSecondary: $dark-text-secondary;
 }

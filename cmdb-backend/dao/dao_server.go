@@ -13,11 +13,11 @@ type ServerStatusNum struct {
 }
 
 func GetServerList() []model.Server {
-
 	var serverList []model.Server
 	err := DB.Where("deleted_at IS NULL").Find(&serverList).Error
 	if err != nil {
-		log.Println(err)
+		log.Printf("获取服务器列表失败: %v", err)
+		return nil
 	}
 	return serverList
 }
@@ -120,14 +120,34 @@ func GetServerOneByIP(ip string) (model.Server, error) {
 }
 
 func GetServerCount() (ServerStatusNum, error) {
-	var servers []model.Server
 	var serverStatusNum ServerStatusNum
-	result := DB.Find(&servers).RowsAffected
-	resultOnline := DB.Where("status=?", 1).Find(&servers).RowsAffected
-	resultOffline := DB.Where("status=?", 0).Find(&servers).RowsAffected
-	serverStatusNum.Total = int(result)
-	serverStatusNum.Online = int(resultOnline)
-	serverStatusNum.Offline = int(resultOffline)
+	
+	// 使用单个查询获取所有统计数据，提高性能
+	var result struct {
+		Total   int
+		Online  int
+		Offline int
+	}
+	
+	// 获取总数
+	err := DB.Model(&model.Server{}).Count(&result.Total).Error
+	if err != nil {
+		return serverStatusNum, err
+	}
+	
+	// 获取在线数量
+	err = DB.Model(&model.Server{}).Where("status = ?", 1).Count(&result.Online).Error
+	if err != nil {
+		return serverStatusNum, err
+	}
+	
+	// 计算离线数量
+	result.Offline = result.Total - result.Online
+	
+	serverStatusNum.Total = result.Total
+	serverStatusNum.Online = result.Online
+	serverStatusNum.Offline = result.Offline
+	
 	return serverStatusNum, nil
 }
 

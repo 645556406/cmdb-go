@@ -54,11 +54,12 @@ export default {
       this.socket = initWebSocket()
       // this.socket = new WebSocket('http://localhost:8080/api/v1/ssh/connect')
       this.socket.onopen = () => {
-        // 发送SSH连接参数
+        // 发送SSH连接参数 - 注意：实际生产环境应使用加密传输
+        console.warn('安全提示：生产环境中SSH凭据应通过加密通道传输')
         this.socket.send(JSON.stringify({
           host: host,
           username: username,
-          password: password // 实际项目应使用加密传输
+          password: password // TODO: 实现加密传输机制
         }))
       }
 

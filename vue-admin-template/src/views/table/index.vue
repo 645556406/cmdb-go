@@ -242,6 +242,7 @@ export default {
       pageSize: 10, // 每页条数
       total: 0, // 总数据量
       searchQuery: '',
+      searchDebounceTimer: null, // 搜索防抖定时器
       row: {},
       table: false,
       dialog: false,
@@ -256,7 +257,14 @@ export default {
       form: {
         IP: '',
         Env: '',
-        Owner: ''
+        Owner: '',
+        HostName: '',
+        OS: '',
+        Area: '',
+        Username: '',
+        Password: '',
+        Port: '',
+        PublicKey: ''
       },
       dialogVisible: false
     }
@@ -292,35 +300,81 @@ export default {
       this.currentPage = val
       this.fetchData()
     },
-    // 搜索还是有问题
+    // 搜索功能优化 - 添加防抖
     searchOneByIP() {
-      this.listLoading = true
+      // 清除之前的定时器
+      if (this.searchDebounceTimer) {
+        clearTimeout(this.searchDebounceTimer)
+      }
+      
+      // 设置新的防抖定时器
+      this.searchDebounceTimer = setTimeout(() => {
+        this.performSearch()
+      }, 300) // 300ms防抖延迟
+    },
+    
+    // 执行实际搜索
+    performSearch() {
       if (this.searchQuery.trim() === '') {
         this.$message({
           type: 'error',
           message: '请填写 IP 地址'
         })
-        this.listLoading = false
         return
       }
+      
+      this.listLoading = true
       getOneByID(this.searchQuery.trim()).then((response) => {
-        if (response.code === 20000) {
-          const serverList = []
-          serverList.push(response.data)
-          this.list = serverList
-          this.listLoading = false
+        if (response && response.code === 20000 && response.data) {
+          this.list = [response.data]
+          this.total = 1
+          this.currentPage = 1
         } else {
           this.$message({
             type: 'error',
-            message: response.message
+            message: response?.message || '未找到对应的服务器'
           })
+          this.fetchData() // 重新获取完整列表
         }
-      }).catch(
-        console.log('数据未查询到！'),
         this.listLoading = false
-      )
+      }).catch(error => {
+        console.error('搜索服务器失败:', error)
+        this.$message({
+          type: 'error',
+          message: '搜索失败，请检查网络连接'
+        })
+        this.fetchData() // 重新获取完整列表
+        this.listLoading = false
+      })
     },
     submitForm() {
+      // 输入验证
+      if (!this.form.IP || !this.form.IP.trim()) {
+        this.$message({
+          type: 'error',
+          message: 'IP地址不能为空'
+        })
+        return
+      }
+      
+      // IP地址格式验证
+      const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+      if (!ipRegex.test(this.form.IP.trim())) {
+        this.$message({
+          type: 'error',
+          message: '请输入有效的IP地址格式'
+        })
+        return
+      }
+
+      if (!this.form.HostName || !this.form.HostName.trim()) {
+        this.$message({
+          type: 'error',
+          message: '主机名不能为空'
+        })
+        return
+      }
+
       addServer(this.form).then((response) => {
         console.log(response)
         if (response.code === 20000) {
@@ -330,6 +384,19 @@ export default {
           })
           this.dialogVisible = false
           this.fetchData()
+          // 重置表单
+          this.form = {
+            IP: '',
+            HostName: '',
+            Env: '',
+            Owner: '',
+            OS: '',
+            Area: '',
+            Username: '',
+            Password: '',
+            Port: '',
+            PublicKey: ''
+          }
         } else {
           this.$message({
             type: 'error',
@@ -337,8 +404,11 @@ export default {
           })
         }
       }).catch(error => {
-        // 错误处理
-        console.log(error)
+        console.error('添加服务器失败:', error)
+        this.$message({
+          type: 'error',
+          message: '添加服务器失败，请检查网络连接'
+        })
       })
     },
     handleClose(done) {
@@ -387,11 +457,23 @@ export default {
     fetchData() {
       this.listLoading = true
       getList().then(response => {
-        this.total = (response.data).length // 假设总共有100条数据
+        if (!response || !response.data) {
+          this.$message.error('获取服务器列表失败')
+          this.listLoading = false
+          return
+        }
+        
+        const allData = response.data
+        this.total = allData.length
+        
         // 根据分页参数截取数据
         const start = (this.currentPage - 1) * this.pageSize
         const end = start + this.pageSize
-        this.list = response.data.slice(start, end)
+        this.list = allData.slice(start, end)
+        this.listLoading = false
+      }).catch(error => {
+        console.error('获取服务器列表失败:', error)
+        this.$message.error('获取服务器列表失败，请检查网络连接')
         this.listLoading = false
       })
     },

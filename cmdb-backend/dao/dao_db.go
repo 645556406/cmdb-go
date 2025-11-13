@@ -28,8 +28,8 @@ func init() {
 		panic(err)
 	}
 	// 设置连接池参数
-	sqlDB.SetMaxIdleConns(10)           // 最大空闲连接数
-	sqlDB.SetMaxOpenConns(100)          // 最大打开连接数
+	sqlDB.SetMaxIdleConns(5)            // 最大空闲连接数，与配置文件一致
+	sqlDB.SetMaxOpenConns(100)          // 最大打开连接数，与配置文件一致
 	sqlDB.SetConnMaxLifetime(time.Hour) // 连接最大存活时间
 	DB = db
 	once := sync.Once{}
